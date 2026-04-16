@@ -16,6 +16,7 @@ export { Profile } from './Profile';
 export { Progress } from './Progress';
 export { PostSession } from './PostSession';
 export { Community } from './Community';
+export { Onboarding } from './Onboarding';
 
 const styles = StyleSheet.create({
   container: {

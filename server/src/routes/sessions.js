@@ -19,7 +19,7 @@ async function sessionRoutes(fastify, options) {
     });
 
     // Update streak and XP asynchronously
-    await sessionModel.updateStreak(userId);
+    await sessionModel.updateStreak(userId, moodScore);
     
     return { success: true, session };
   });

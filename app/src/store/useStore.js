@@ -20,8 +20,12 @@ const useStore = create((set, get) => ({
   user: null,
   token: null,
   isAuthenticated: false,
+  hasOnboarded: false,
+  intention: null,
 
   setAuth: (user, token) => set({ user, token, isAuthenticated: !!token }),
+
+  completeOnboarding: (intention) => set({ hasOnboarded: true, intention }),
 
   logout: () => set({ user: null, token: null, isAuthenticated: false }),
 

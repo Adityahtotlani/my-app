@@ -66,16 +66,31 @@ export const Home = ({ navigation }) => {
           </View>
         </View>
 
-        <View style={styles.xpCard}>
-          <View style={styles.xpHeader}>
-            <Star color="#6366f1" size={24} />
-            <Text style={styles.xpTitle}>Total XP: {user?.total_xp || 0}</Text>
-          </View>
-          <View style={styles.progressBar}>
-            <View style={[styles.progressFill, { width: `${(user?.total_xp % 1000) / 10}%` }]} />
-          </View>
-          <Text style={styles.xpFooter}>{1000 - (user?.total_xp % 1000)} XP to Level {user?.level + 1}</Text>
-        </View>
+        {(() => {
+          const THRESHOLDS = [0, 500, 1500, 3500, 7000, 12000];
+          const lvl = user?.level || 1;
+          const xp = user?.total_xp || 0;
+          const prevXP = THRESHOLDS[lvl - 1] ?? 0;
+          const nextXP = THRESHOLDS[lvl] ?? 12000;
+          const progressPct = lvl >= 6 ? 100 : Math.min(100, ((xp - prevXP) / (nextXP - prevXP)) * 100);
+          const xpToNext = lvl >= 6 ? 0 : nextXP - xp;
+          return (
+            <View style={styles.xpCard}>
+              <View style={styles.xpHeader}>
+                <Star color="#6366f1" size={24} />
+                <Text style={styles.xpTitle}>Total XP: {xp}</Text>
+              </View>
+              <View style={styles.progressBar}>
+                <View style={[styles.progressFill, { width: `${progressPct}%` }]} />
+              </View>
+              <Text style={styles.xpFooter}>
+                {lvl >= 6
+                  ? 'Max Level — Luminous'
+                  : `${xpToNext} XP to Level ${lvl + 1}`}
+              </Text>
+            </View>
+          );
+        })()}
 
         <TouchableOpacity
           style={styles.ctaButton}

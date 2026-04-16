@@ -15,7 +15,7 @@ const Session = (pg) => ({
     return rows;
   },
 
-  async updateStreak(userId) {
+  async updateStreak(userId, moodScore) {
     // 1. Log the practice day in 'streaks' table
     // 2. Update 'current_streak' and 'max_streak' in 'users' table
     // 3. Increment XP based on session type
@@ -117,6 +117,24 @@ const Session = (pg) => ({
         );
       }
     }
+
+    // +10 XP bonus for logging mood
+    if (moodScore && moodScore >= 1 && moodScore <= 5) {
+      await pg.query('UPDATE users SET total_xp = total_xp + 10 WHERE id = $1', [userId]);
+    }
+
+    // Final level recalculation
+    await pg.query(
+      `UPDATE users SET level = CASE
+         WHEN total_xp >= 12000 THEN 6
+         WHEN total_xp >= 7000 THEN 5
+         WHEN total_xp >= 3500 THEN 4
+         WHEN total_xp >= 1500 THEN 3
+         WHEN total_xp >= 500 THEN 2
+         ELSE 1 END
+       WHERE id = $1`,
+      [userId]
+    );
   }
 });
 

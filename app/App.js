@@ -2,7 +2,7 @@ import React, { useEffect } from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import { Home, Practice, Progress, Profile, Login, Register, PostSession, Community } from './src/screens';
+import { Home, Practice, Progress, Profile, Login, Register, PostSession, Community, Onboarding } from './src/screens';
 import { Home as HomeIcon, Play, BarChart2, User, Users } from 'lucide-react-native';
 import useStore from './src/store/useStore';
 import { registerForPushNotificationsAsync, schedulePracticeReminder } from './src/services/notifications';
@@ -59,21 +59,27 @@ function MainTabs() {
 
 export default function App() {
   const isAuthenticated = useStore((state) => state.isAuthenticated);
+  const hasOnboarded = useStore((state) => state.hasOnboarded);
 
   useEffect(() => {
-    if (isAuthenticated) {
+    if (isAuthenticated && hasOnboarded) {
       registerForPushNotificationsAsync();
-      schedulePracticeReminder(6, 30);
     }
-  }, [isAuthenticated]);
+  }, [isAuthenticated, hasOnboarded]);
 
   return (
     <NavigationContainer>
       {isAuthenticated ? (
-        <Stack.Navigator screenOptions={{ headerShown: false }}>
-          <Stack.Screen name="Main" component={MainTabs} />
-          <Stack.Screen name="PostSession" component={PostSession} />
-        </Stack.Navigator>
+        hasOnboarded ? (
+          <Stack.Navigator screenOptions={{ headerShown: false }}>
+            <Stack.Screen name="Main" component={MainTabs} />
+            <Stack.Screen name="PostSession" component={PostSession} />
+          </Stack.Navigator>
+        ) : (
+          <Stack.Navigator screenOptions={{ headerShown: false }}>
+            <Stack.Screen name="Onboarding" component={Onboarding} />
+          </Stack.Navigator>
+        )
       ) : (
         <AuthStack />
       )}
