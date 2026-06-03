@@ -6,10 +6,15 @@ const useStore = create((set, get) => ({
   isAuthenticated: false,
   hasOnboarded: false,
   intention: null,
+  reminderHour: 6,
+  reminderMinute: 30,
 
   setAuth: (user, token) => set({ user, token, isAuthenticated: !!token }),
 
-  completeOnboarding: (intention) => set({ hasOnboarded: true, intention }),
+  completeOnboarding: (intention, hour, minute) =>
+    set({ hasOnboarded: true, intention, reminderHour: hour, reminderMinute: minute }),
+
+  setReminder: (hour, minute) => set({ reminderHour: hour, reminderMinute: minute }),
 
   logout: () => set({ user: null, token: null, isAuthenticated: false }),
 

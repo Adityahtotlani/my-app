@@ -120,7 +120,7 @@ export const Onboarding = () => {
         onPress={async () => {
           const chosen = REMINDERS[reminderIdx];
           await schedulePracticeReminder(chosen.hour, chosen.minute);
-          completeOnboarding(intention);
+          completeOnboarding(intention, chosen.hour, chosen.minute);
         }}
       >
         <Text style={styles.primaryBtnText}>Begin Practice</Text>

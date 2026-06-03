@@ -1,7 +1,21 @@
-import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, SafeAreaView, Alert } from 'react-native';
+import React, { useState } from 'react';
+import { View, Text, StyleSheet, TouchableOpacity, SafeAreaView, Alert, Modal } from 'react-native';
 import useStore from '../store/useStore';
-import { LogOut, User, Settings, Bell, Shield, Flame, Star } from 'lucide-react-native';
+import { schedulePracticeReminder } from '../services/notifications';
+import { LogOut, User, Settings, Bell, Shield, Flame, Star, Sunrise, Sun, Moon } from 'lucide-react-native';
+
+const REMINDERS = [
+  { label: 'Morning · 6:30 AM', icon: Sunrise, hour: 6, minute: 30 },
+  { label: 'Midday · 12:00 PM', icon: Sun, hour: 12, minute: 0 },
+  { label: 'Evening · 7:00 PM', icon: Moon, hour: 19, minute: 0 },
+];
+
+const formatReminder = (hour, minute) => {
+  const period = hour < 12 ? 'AM' : 'PM';
+  const displayHour = hour % 12 || 12;
+  const displayMinute = minute.toString().padStart(2, '0');
+  return `${displayHour}:${displayMinute} ${period}`;
+};
 
 const getLevelName = (level) => {
   const names = ['', 'Seeker', 'Practitioner', 'Steady Breather', 'Inner Circle', 'SKY Guide', 'Luminous'];
@@ -9,23 +23,35 @@ const getLevelName = (level) => {
 };
 
 export const Profile = () => {
-  const { user, logout } = useStore();
+  const { user, logout, reminderHour, reminderMinute, setReminder } = useStore();
+  const [showReminderModal, setShowReminderModal] = useState(false);
+  const [selectedIdx, setSelectedIdx] = useState(() =>
+    REMINDERS.findIndex((r) => r.hour === reminderHour && r.minute === reminderMinute)
+  );
 
   const handleLogout = () => {
     Alert.alert('Logout', 'Are you sure you want to log out?', [
       { text: 'Cancel', style: 'cancel' },
-      { text: 'Logout', style: 'destructive', onPress: logout }
+      { text: 'Logout', style: 'destructive', onPress: logout },
     ]);
   };
 
-  const ProfileItem = ({ icon: Icon, label, value }) => (
-    <View style={styles.item}>
+  const handleSaveReminder = async () => {
+    if (selectedIdx === -1) return;
+    const chosen = REMINDERS[selectedIdx];
+    await schedulePracticeReminder(chosen.hour, chosen.minute);
+    setReminder(chosen.hour, chosen.minute);
+    setShowReminderModal(false);
+  };
+
+  const ProfileItem = ({ icon: Icon, label, value, onPress }) => (
+    <TouchableOpacity style={styles.item} onPress={onPress} disabled={!onPress}>
       <View style={styles.itemLeft}>
         <Icon color="#64748b" size={20} />
         <Text style={styles.itemLabel}>{label}</Text>
       </View>
-      <Text style={styles.itemValue}>{value}</Text>
-    </View>
+      <Text style={[styles.itemValue, onPress && styles.itemValueTappable]}>{value}</Text>
+    </TouchableOpacity>
   );
 
   return (
@@ -45,7 +71,12 @@ export const Profile = () => {
 
       <View style={styles.section}>
         <Text style={styles.sectionTitle}>Account Settings</Text>
-        <ProfileItem icon={Settings} label="Practice Reminder" value="6:30 AM" />
+        <ProfileItem
+          icon={Settings}
+          label="Practice Reminder"
+          value={formatReminder(reminderHour, reminderMinute)}
+          onPress={() => setShowReminderModal(true)}
+        />
         <ProfileItem icon={Bell} label="Notifications" value="Enabled" />
         <ProfileItem icon={Shield} label="Privacy" value="Managed" />
         <ProfileItem icon={Flame} label="Personal Best Streak" value={`${user?.max_streak || 0} days`} />
@@ -56,6 +87,40 @@ export const Profile = () => {
         <LogOut color="#ef4444" size={20} />
         <Text style={styles.logoutText}>Log Out</Text>
       </TouchableOpacity>
+
+      <Modal visible={showReminderModal} transparent animationType="slide">
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalSheet}>
+            <Text style={styles.modalTitle}>Change Reminder</Text>
+            {REMINDERS.map((item, idx) => {
+              const Icon = item.icon;
+              const selected = selectedIdx === idx;
+              return (
+                <TouchableOpacity
+                  key={item.label}
+                  style={[styles.timeCard, selected && styles.timeCardSelected]}
+                  onPress={() => setSelectedIdx(idx)}
+                >
+                  <Icon color={selected ? '#fff' : '#6366f1'} size={24} />
+                  <Text style={[styles.timeCardText, selected && styles.timeCardTextSelected]}>
+                    {item.label}
+                  </Text>
+                </TouchableOpacity>
+              );
+            })}
+            <TouchableOpacity
+              style={[styles.saveButton, selectedIdx === -1 && styles.saveButtonDisabled]}
+              onPress={handleSaveReminder}
+              disabled={selectedIdx === -1}
+            >
+              <Text style={styles.saveButtonText}>Save</Text>
+            </TouchableOpacity>
+            <TouchableOpacity onPress={() => setShowReminderModal(false)}>
+              <Text style={styles.cancelText}>Cancel</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
     </SafeAreaView>
   );
 };
@@ -144,6 +209,10 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: '#94a3b8',
   },
+  itemValueTappable: {
+    color: '#6366f1',
+    fontWeight: '600',
+  },
   logoutButton: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -160,5 +229,67 @@ const styles = StyleSheet.create({
     color: '#ef4444',
     fontSize: 16,
     fontWeight: 'bold',
+  },
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.4)',
+    justifyContent: 'flex-end',
+  },
+  modalSheet: {
+    backgroundColor: '#fff',
+    borderTopLeftRadius: 24,
+    borderTopRightRadius: 24,
+    padding: 24,
+    paddingBottom: 40,
+  },
+  modalTitle: {
+    fontSize: 20,
+    fontWeight: '700',
+    color: '#1e293b',
+    marginBottom: 20,
+  },
+  timeCard: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#f8fafc',
+    padding: 16,
+    borderRadius: 14,
+    marginBottom: 12,
+    gap: 14,
+    borderWidth: 2,
+    borderColor: 'transparent',
+  },
+  timeCardSelected: {
+    backgroundColor: '#6366f1',
+    borderColor: '#6366f1',
+  },
+  timeCardText: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#1e293b',
+  },
+  timeCardTextSelected: {
+    color: '#fff',
+  },
+  saveButton: {
+    backgroundColor: '#6366f1',
+    paddingVertical: 16,
+    borderRadius: 14,
+    alignItems: 'center',
+    marginTop: 8,
+    marginBottom: 12,
+  },
+  saveButtonDisabled: {
+    opacity: 0.5,
+  },
+  saveButtonText: {
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: '700',
+  },
+  cancelText: {
+    textAlign: 'center',
+    fontSize: 15,
+    color: '#94a3b8',
   },
 });
