@@ -19,6 +19,7 @@
     "react-native-reanimated": "~3.6.2",
     "zustand": "^4.5.2",
     "lucide-react-native": "^0.363.0",
+    "react-native-svg": "15.15.4",
     "victory-native": "^36.6.12",
     "@react-navigation/native": "^6.1.17",
     "@react-navigation/bottom-tabs": "^6.5.20",

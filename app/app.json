@@ -12,7 +12,10 @@
     },
     "ios": {
       "supportsTablet": false,
-      "bundleIdentifier": "com.adityahtotlani.skycompanion"
+      "bundleIdentifier": "com.adityahtotlani.skycompanion",
+      "infoPlist": {
+        "NSUserNotificationsUsageDescription": "SKY Companion sends daily practice reminders to help you stay consistent."
+      }
     },
     "android": {
       "adaptiveIcon": {
