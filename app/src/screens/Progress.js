@@ -38,7 +38,7 @@ export const Progress = () => {
 
   const fetchHistory = async () => {
     try {
-      const response = await fetch('http://localhost:3000/api/sessions/history', {
+      const response = await fetch('https://octoally.adityatotlani.ch/api/sessions/history', {
         headers: { 'Authorization': `Bearer ${token}` }
       });
       const data = await response.json();
@@ -50,7 +50,7 @@ export const Progress = () => {
 
   const fetchStreakCalendar = async () => {
     try {
-      const response = await fetch('http://localhost:3000/api/sessions/streak-calendar', {
+      const response = await fetch('https://octoally.adityatotlani.ch/api/sessions/streak-calendar', {
         headers: { 'Authorization': `Bearer ${token}` }
       });
       const data = await response.json();
@@ -62,7 +62,7 @@ export const Progress = () => {
 
   const fetchMoodTrend = async () => {
     try {
-      const response = await fetch('http://localhost:3000/api/sessions/mood-trend', {
+      const response = await fetch('https://octoally.adityatotlani.ch/api/sessions/mood-trend', {
         headers: { 'Authorization': `Bearer ${token}` }
       });
       const data = await response.json();

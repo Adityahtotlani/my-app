@@ -38,7 +38,7 @@ const useStore = create((set, get) => ({
     if (!token) return;
 
     try {
-      const response = await fetch('http://localhost:3000/api/auth/me', {
+      const response = await fetch('https://octoally.adityatotlani.ch/api/auth/me', {
         headers: {
           'Authorization': `Bearer ${token}`
         }
@@ -60,7 +60,7 @@ const useStore = create((set, get) => ({
     const xpGain = sessionData.type === 'full' ? 100 : 50;
 
     try {
-      const response = await fetch('http://localhost:3000/api/sessions/log', {
+      const response = await fetch('https://octoally.adityatotlani.ch/api/sessions/log', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
