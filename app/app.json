@@ -1,0 +1,30 @@
+{
+  "expo": {
+    "name": "SKY Companion",
+    "slug": "sky-companion",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "splash": {
+      "image": "./assets/splash.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#6366f1"
+    },
+    "ios": {
+      "supportsTablet": false,
+      "bundleIdentifier": "com.adityahtotlani.skycompanion"
+    },
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/adaptive-icon.png",
+        "backgroundColor": "#6366f1"
+      },
+      "package": "com.adityahtotlani.skycompanion"
+    },
+    "extra": {
+      "eas": {
+        "projectId": "YOUR_EXPO_PROJECT_ID"
+      }
+    }
+  }
+}
