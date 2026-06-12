@@ -35,7 +35,7 @@
 /* Begin PBXFileReference section */
 		1240ECEB1E0B488EA54CD9D3 /* SKYCompanionApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SKYCompanionApp.swift; sourceTree = "<group>"; };
 		D5715CF9AF9A40048589689F /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
-		A31ADF0170C54767A4894F55 /* Color+Sky.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Color+Sky.swift; sourceTree = "<group>"; };
+		A31ADF0170C54767A4894F55 /* Color+Sky.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Color+Sky.swift"; sourceTree = "<group>"; };
 		A120344D542E4C63B521B4CA /* ViewModifiers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewModifiers.swift; sourceTree = "<group>"; };
 		13356E6A2BA24F1285D730B0 /* Session.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Session.swift; sourceTree = "<group>"; };
 		16AA84941FA74956B1D28DF6 /* User.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = User.swift; sourceTree = "<group>"; };
