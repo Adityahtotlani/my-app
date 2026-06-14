@@ -20,7 +20,8 @@ CREATE TABLE IF NOT EXISTS sessions (
     duration_seconds INT NOT NULL,
     completed_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
     hrv_delta INT,
-    mood_score INT -- 1-5 scale
+    mood_score INT, -- 1-5 scale
+    note VARCHAR(500)
 );
 
 -- Streaks table (log of practice days)

@@ -15,7 +15,7 @@ struct LoginView: View {
                 VStack(spacing: 32) {
                     VStack(spacing: 8) {
                         Text("SKY Companion")
-                            .font(.system(size: 32, weight: .heavy))
+                            .font(.largeTitle.weight(.heavy))
                             .foregroundColor(.skyText)
                         Text("Your daily breath practice, guided.")
                             .font(.subheadline)
@@ -54,7 +54,7 @@ struct LoginView: View {
                 .padding(.horizontal, 24)
             }
         }
-        .navigationBarHidden(true)
+        .toolbar(.hidden, for: .navigationBar)
     }
 
     private func handleLogin() async {

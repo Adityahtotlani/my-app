@@ -26,14 +26,30 @@ struct StreakCalendarView: View {
         return entries
     }
 
+    private var dateRangeLabel: String {
+        guard let first = last70Days.first, let last = last70Days.last else { return "" }
+        let mf = DateFormatter(); mf.dateFormat = "MMM"
+        let yf = DateFormatter(); yf.dateFormat = "yyyy"
+        let s = mf.string(from: first); let e = mf.string(from: last)
+        return s == e ? "\(e) \(yf.string(from: last))" : "\(s) – \(e) \(yf.string(from: last))"
+    }
+
     var body: some View {
         VStack(alignment: .leading, spacing: 10) {
             HStack {
-                Text("Practice Streak")
-                    .font(.system(size: 16, weight: .bold)).foregroundColor(.skySub)
+                VStack(alignment: .leading, spacing: 2) {
+                    Text("Practice Calendar")
+                        .font(.system(size: 16, weight: .bold)).foregroundColor(.skySub)
+                    Text(dateRangeLabel)
+                        .font(.system(size: 11)).foregroundColor(.skyMuted)
+                }
                 Spacer()
-                Text("\(practicedDates.count) day\(practicedDates.count == 1 ? "" : "s") practiced")
-                    .font(.system(size: 12)).foregroundColor(.skyMuted)
+                VStack(alignment: .trailing, spacing: 2) {
+                    Text("\(practicedDates.count)")
+                        .font(.system(size: 16, weight: .bold)).foregroundColor(.skyIndigo)
+                    Text("days practiced")
+                        .font(.system(size: 11)).foregroundColor(.skyMuted)
+                }
             }
 
             HStack {

@@ -46,8 +46,20 @@ struct HomeView: View {
         }
     }
 
-    private var activeMilestone: Milestone? {
-        milestones.first { streak >= $0.minStreak }
+    private var activeMilestone: Milestone? { milestones.first { streak >= $0.minStreak } }
+    private var nextMilestone: Milestone?   { milestones.last  { streak < $0.minStreak }  }
+
+    private var minutesThisWeek: Int {
+        let cal = Calendar.current
+        let today = Date()
+        let weekday = cal.component(.weekday, from: today)
+        let daysFromMonday = weekday == 1 ? 6 : weekday - 2
+        guard let monday = cal.date(byAdding: .day, value: -daysFromMonday, to: today) else { return 0 }
+        let f = DateFormatter(); f.dateFormat = "yyyy-MM-dd"
+        return store.localSessions.filter {
+            guard let d = f.date(from: $0.date) else { return false }
+            return cal.startOfDay(for: d) >= cal.startOfDay(for: monday)
+        }.reduce(0) { $0 + $1.durationSeconds / 60 }
     }
 
     private var xpProgress: Double {
@@ -55,6 +67,17 @@ struct HomeView: View {
         let prev = levelThresholds[level - 1]
         let next = levelThresholds[level]
         return min(1.0, Double(totalXP - prev) / Double(next - prev))
+    }
+
+    private var levelName: String {
+        let names = ["", "Seeker", "Practitioner", "Steady Breather", "Inner Circle", "SKY Guide", "Luminous"]
+        return names.indices.contains(level) ? names[level] : "Seeker"
+    }
+
+    private var shareText: String {
+        streak > 0
+            ? "I've been practicing SKY Breath Meditation for \(streak) day\(streak == 1 ? "" : "s") straight 🔥 – tracking my journey with SKY Companion."
+            : "Just started my SKY Breath Meditation journey with SKY Companion ✨"
     }
 
     private var xpToNext: Int {
@@ -71,31 +94,42 @@ struct HomeView: View {
                     VStack(alignment: .leading, spacing: 20) {
 
                         // Header
-                        VStack(alignment: .leading, spacing: 4) {
-                            Text(greeting)
-                                .font(.system(size: 15))
-                                .foregroundColor(.skySub)
-                            Text(user?.username ?? (store.localName.isEmpty ? "Practitioner" : store.localName))
-                                .font(.system(size: 32, weight: .heavy))
-                                .foregroundColor(.skyText)
-                            if let intention = store.intention, !intention.isEmpty {
-                                HStack(spacing: 5) {
-                                    Image(systemName: "leaf.fill")
-                                        .font(.system(size: 11))
-                                        .foregroundColor(.skyIndigo)
-                                    Text("Practicing for: \(intention)")
-                                        .font(.system(size: 13))
+                        HStack(alignment: .top) {
+                            VStack(alignment: .leading, spacing: 4) {
+                                Text(greeting)
+                                    .font(.subheadline)
+                                    .foregroundColor(.skySub)
+                                Text(user?.username ?? (store.localName.isEmpty ? "Practitioner" : store.localName))
+                                    .font(.largeTitle.weight(.heavy))
+                                    .foregroundColor(.skyText)
+                                if let intention = store.intention, !intention.isEmpty {
+                                    Label("Practicing for: \(intention)", systemImage: "leaf.fill")
+                                        .font(.caption)
                                         .foregroundColor(.skySub)
+                                        .padding(.top, 2)
                                 }
-                                .padding(.top, 2)
                             }
+                            Spacer()
+                            // 44×44 tap target per HIG
+                            ShareLink(item: shareText) {
+                                Image(systemName: "square.and.arrow.up")
+                                    .font(.subheadline.weight(.medium))
+                                    .foregroundColor(.skyIndigo)
+                                    .frame(width: 44, height: 44)
+                                    .background(Color.skyIndigoLight)
+                                    .clipShape(Circle())
+                            }
+                            .padding(.top, 6)
                         }
                         .padding(.top, 8)
 
                         // Stats row
                         HStack(spacing: 15) {
-                            StatCard(icon: "flame.fill", iconColor: .red, value: "\(streak)", label: "Day Streak")
-                            StatCard(icon: "trophy.fill", iconColor: .yellow, value: "\(level)", label: "Level")
+                            StatCard(icon: "flame.fill", iconColor: .red, value: "\(streak)", label: "Day Streak",
+                                     subtitle: store.localMaxStreak > streak && store.localMaxStreak > 0
+                                         ? "Best: \(store.localMaxStreak) days" : nil)
+                            StatCard(icon: "trophy.fill", iconColor: .yellow, value: "\(level)", label: "Level",
+                                     subtitle: levelName)
                         }
 
                         // XP bar
@@ -103,7 +137,7 @@ struct HomeView: View {
                             HStack {
                                 Image(systemName: "star.fill").foregroundColor(.skyIndigo)
                                 Text("Total XP: \(totalXP)")
-                                    .font(.system(size: 17, weight: .bold))
+                                    .font(.headline)
                                     .foregroundColor(.skyText)
                             }
                             GeometryReader { geo in
@@ -128,7 +162,7 @@ struct HomeView: View {
                             HStack {
                                 VStack(alignment: .leading, spacing: 4) {
                                     Text(practicedToday ? "Session Complete ✓" : "Ready for SKY?")
-                                        .font(.system(size: 20, weight: .bold))
+                                        .font(.title3.weight(.bold))
                                         .foregroundColor(.white)
                                     Text(practicedToday ? "Practice again anytime" : "Guided Daily Practice • 35m")
                                         .font(.subheadline)
@@ -155,14 +189,13 @@ struct HomeView: View {
                         // Streak at risk warning
                         if store.localStreakAtRisk {
                             HStack(spacing: 12) {
-                                Text("🔥")
-                                    .font(.title2)
+                                Text("🔥").font(.title2)
                                 VStack(alignment: .leading, spacing: 2) {
                                     Text("Streak at Risk!")
-                                        .font(.system(size: 14, weight: .bold))
+                                        .font(.footnote.weight(.bold))
                                         .foregroundColor(Color(red: 154/255, green: 52/255, blue: 18/255))
                                     Text("Practice today to keep your \(streak)-day streak.")
-                                        .font(.system(size: 13))
+                                        .font(.footnote)
                                         .foregroundColor(Color(red: 154/255, green: 52/255, blue: 18/255).opacity(0.75))
                                 }
                                 Spacer()
@@ -177,31 +210,57 @@ struct HomeView: View {
                         }
 
                         // First-session welcome card
-                        if store.localSessions.isEmpty {
-                            FirstSessionCard()
-                        }
+                        if store.localSessions.isEmpty { FirstSessionCard() }
 
                         // This Week strip
-                        Text("This Week")
-                            .font(.system(size: 20, weight: .bold))
-                            .foregroundColor(.skyText)
+                        HStack(alignment: .firstTextBaseline) {
+                            Text("This Week")
+                                .font(.title3.weight(.bold))
+                                .foregroundColor(.skyText)
+                            Spacer()
+                            if minutesThisWeek > 0 {
+                                Text("\(minutesThisWeek) min")
+                                    .font(.footnote.weight(.semibold))
+                                    .foregroundColor(.skyIndigo)
+                            }
+                        }
 
                         WeekStripView(practicedDates: store.localPracticedDates)
 
                         // Milestone card
                         if let m = activeMilestone {
                             VStack(alignment: .leading, spacing: 8) {
-                                Text(m.title).font(.system(size: 16, weight: .bold)).foregroundColor(.skyIndigo)
-                                Text(m.body).font(.system(size: 14)).foregroundColor(.skySub).lineSpacing(4)
+                                Text(m.title).font(.callout.weight(.bold)).foregroundColor(.skyIndigo)
+                                Text(m.body).font(.footnote).foregroundColor(.skySub).lineSpacing(4)
                                 Text(m.teacher).font(.caption).foregroundColor(.skyMuted)
                             }
                             .padding(16)
                             .overlay(alignment: .leading) {
                                 Rectangle().fill(Color.skyIndigo).frame(width: 4)
                             }
-                            .background(Color.white)
+                            .background(Color(UIColor.secondarySystemBackground))
                             .clipShape(RoundedRectangle(cornerRadius: 16))
                             .shadow(color: .black.opacity(0.05), radius: 8, y: 2)
+                        }
+
+                        // Next milestone teaser
+                        if let next = nextMilestone, streak > 0 {
+                            let remaining = next.minStreak - streak
+                            HStack(spacing: 10) {
+                                Image(systemName: "flag.checkered")
+                                    .foregroundColor(.skyIndigo)
+                                    .font(.footnote)
+                                (Text("\(remaining) day\(remaining == 1 ? "" : "s") to ")
+                                    .font(.footnote)
+                                    .foregroundColor(.skySub)
+                                + Text(next.title.replacingOccurrences(of: " ✦", with: ""))
+                                    .font(.footnote.weight(.semibold))
+                                    .foregroundColor(.skyIndigo))
+                                Spacer()
+                            }
+                            .padding(14)
+                            .background(Color.skyIndigoLight)
+                            .clipShape(RoundedRectangle(cornerRadius: 14))
                         }
 
                         // Retreat banner
@@ -228,16 +287,20 @@ private struct StatCard: View {
     let iconColor: Color
     let value: String
     let label: String
+    var subtitle: String? = nil
 
     var body: some View {
-        VStack(spacing: 10) {
+        VStack(spacing: 6) {
             Image(systemName: icon).foregroundColor(iconColor).font(.title)
-            Text(value).font(.system(size: 24, weight: .bold)).foregroundColor(.skyText)
+            Text(value).font(.title2.weight(.bold)).foregroundColor(.skyText)
             Text(label).font(.caption).foregroundColor(.skySub)
+            if let sub = subtitle {
+                Text(sub).font(.caption2).foregroundColor(.skyMuted)
+            }
         }
         .frame(maxWidth: .infinity)
         .padding(20)
-        .background(Color.white)
+        .background(Color(UIColor.secondarySystemBackground))
         .clipShape(RoundedRectangle(cornerRadius: 20))
         .shadow(color: .black.opacity(0.05), radius: 10, y: 2)
     }
@@ -250,11 +313,10 @@ private struct WeekStripView: View {
         let f = DateFormatter(); f.dateFormat = "yyyy-MM-dd"; return f
     }()
 
-    // Monday-anchored week days
     private var weekDays: [(date: Date, label: String)] {
         let cal = Calendar.current
         let today = Date()
-        let weekday = cal.component(.weekday, from: today) // 1=Sun…7=Sat
+        let weekday = cal.component(.weekday, from: today)
         let daysFromMonday = weekday == 1 ? 6 : weekday - 2
         guard let monday = cal.date(byAdding: .day, value: -daysFromMonday, to: today) else { return [] }
         let letters = ["M","T","W","T","F","S","S"]
@@ -270,12 +332,9 @@ private struct WeekStripView: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
-            HStack {
-                Text("Practiced \(practicedThisWeek) of 7 days")
-                    .font(.system(size: 13))
-                    .foregroundColor(.skySub)
-                Spacer()
-            }
+            Text("Practiced \(practicedThisWeek) of 7 days")
+                .font(.footnote)
+                .foregroundColor(.skySub)
 
             HStack(spacing: 6) {
                 ForEach(Array(weekDays.enumerated()), id: \.offset) { _, entry in
@@ -286,7 +345,7 @@ private struct WeekStripView: View {
 
                     VStack(spacing: 6) {
                         Text(entry.label)
-                            .font(.system(size: 11, weight: isToday ? .bold : .regular))
+                            .font(isToday ? .caption2.weight(.bold) : .caption2)
                             .foregroundColor(isToday ? .skyIndigo : .skyMuted)
 
                         ZStack {
@@ -295,16 +354,12 @@ private struct WeekStripView: View {
                                     ? Color.skyIndigo
                                     : isFuture ? Color.clear : Color(UIColor.systemGray5))
                                 .frame(width: 34, height: 34)
-
                             if isToday && !practiced {
-                                Circle()
-                                    .stroke(Color.skyIndigo, lineWidth: 2)
-                                    .frame(width: 34, height: 34)
+                                Circle().stroke(Color.skyIndigo, lineWidth: 2).frame(width: 34, height: 34)
                             }
-
                             if practiced {
                                 Image(systemName: "checkmark")
-                                    .font(.system(size: 13, weight: .bold))
+                                    .font(.caption.weight(.bold))
                                     .foregroundColor(.white)
                             }
                         }
@@ -321,18 +376,16 @@ private struct FirstSessionCard: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
             Label("Your Journey Starts Here", systemImage: "wind")
-                .font(.system(size: 14, weight: .semibold))
+                .font(.footnote.weight(.semibold))
                 .foregroundColor(.skyIndigo)
-
             Text("Your first SKY session takes about 35 minutes and guides you through 5 breathing phases. Even one session creates measurable change in your nervous system.")
-                .font(.system(size: 14))
+                .font(.footnote)
                 .foregroundColor(.skySub)
                 .lineSpacing(3)
-
             HStack(spacing: 8) {
                 ForEach(["35 min", "5 phases", "Eyes closed"], id: \.self) { tip in
                     Text(tip)
-                        .font(.system(size: 11, weight: .semibold))
+                        .font(.caption2.weight(.semibold))
                         .foregroundColor(.skyIndigo)
                         .padding(.horizontal, 9).padding(.vertical, 4)
                         .background(Color.skyIndigoLight)
@@ -350,18 +403,18 @@ private struct RetreatBanner: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
             Text("Ready to go deeper?")
-                .font(.system(size: 16, weight: .bold)).foregroundColor(.skyText)
+                .font(.callout.weight(.bold)).foregroundColor(.skyText)
             Text("You've practiced 30 days in a row. The AoL Part 2 retreat is where the next transformation happens.")
-                .font(.system(size: 14)).foregroundColor(.skySub).lineSpacing(4)
+                .font(.footnote).foregroundColor(.skySub).lineSpacing(4)
             Link(destination: URL(string: "https://www.artofliving.org/us-en/advance-meditation-course")!) {
                 Text("Browse Upcoming Retreats")
-                    .font(.system(size: 14, weight: .semibold)).foregroundColor(.white)
+                    .font(.footnote.weight(.semibold)).foregroundColor(.white)
                     .frame(maxWidth: .infinity).padding(12)
                     .background(Color.skyIndigo)
                     .clipShape(RoundedRectangle(cornerRadius: 10))
             }
             Button("Remind me later", action: onDismiss)
-                .font(.system(size: 13)).foregroundColor(.skyMuted).frame(maxWidth: .infinity)
+                .font(.footnote).foregroundColor(.skyMuted).frame(maxWidth: .infinity)
         }
         .padding(16)
         .background(Color(red: 254/255, green: 249/255, blue: 195/255))

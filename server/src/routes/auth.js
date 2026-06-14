@@ -15,8 +15,19 @@ async function authRoutes(fastify, options) {
 
     const user = await userModel.create({ email, password, courseCode });
     const token = fastify.jwt.sign({ id: user.id, email: user.email });
-    
-    return { user, token };
+
+    return {
+      user: {
+        id: user.id,
+        email: user.email,
+        is_verified: user.is_verified,
+        current_streak: user.current_streak,
+        max_streak: user.max_streak,
+        total_xp: user.total_xp,
+        level: user.level
+      },
+      token
+    };
   });
 
   // Login
@@ -41,6 +52,7 @@ async function authRoutes(fastify, options) {
         email: user.email,
         is_verified: user.is_verified,
         current_streak: user.current_streak,
+        max_streak: user.max_streak,
         total_xp: user.total_xp,
         level: user.level
       },

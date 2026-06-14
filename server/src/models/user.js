@@ -9,7 +9,7 @@ const User = (pg) => ({
   async create({ email, password, courseCode }) {
     const passwordHash = await bcrypt.hash(password, 10);
     const { rows } = await pg.query(
-      'INSERT INTO users (email, password_hash, course_code) VALUES ($1, $2, $3) RETURNING id, email, course_code, is_verified',
+      'INSERT INTO users (email, password_hash, course_code) VALUES ($1, $2, $3) RETURNING id, email, course_code, is_verified, current_streak, max_streak, total_xp, level',
       [email, passwordHash, courseCode]
     );
     return rows[0];

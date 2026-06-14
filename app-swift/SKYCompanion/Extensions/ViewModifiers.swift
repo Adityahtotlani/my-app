@@ -26,7 +26,7 @@ struct SKYPrimaryButton: View {
     var body: some View {
         Button(action: action) {
             Text(title)
-                .font(.system(size: 17, weight: .bold))
+                .font(.headline)
                 .foregroundColor(.white)
                 .frame(maxWidth: .infinity)
                 .padding(.vertical, 16)
@@ -57,6 +57,6 @@ struct SKYTextField: View {
         .overlay {
             RoundedRectangle(cornerRadius: 14).stroke(Color(UIColor.systemGray4), lineWidth: 1)
         }
-        .font(.system(size: 16))
+        .font(.callout)
     }
 }

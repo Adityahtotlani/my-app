@@ -7,15 +7,15 @@ async function sessionRoutes(fastify, options) {
   fastify.post('/log', {
     onRequest: [fastify.authenticate]
   }, async (request, reply) => {
-    const { type, durationSeconds, hrvDelta, moodScore } = request.body;
+    const { type, durationSeconds, moodScore, note } = request.body;
     const userId = request.user.id;
-    
+
     const session = await sessionModel.create({
       userId,
       type,
       durationSeconds,
-      hrvDelta,
-      moodScore
+      moodScore,
+      note
     });
 
     // Update streak and XP asynchronously

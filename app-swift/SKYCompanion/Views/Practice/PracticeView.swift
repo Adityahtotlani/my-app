@@ -41,6 +41,9 @@ struct PracticeView: View {
     @State private var toastMessage: String = ""
     @State private var showPhaseToast = false
     @State private var toastTask: Task<Void, Never>?
+    @State private var backgroundEntryDate: Date?
+
+    @Environment(\.scenePhase) private var scenePhase
 
     enum SessionType { case full, short }
 
@@ -62,6 +65,18 @@ struct PracticeView: View {
         }
     }
 
+    private var phaseAccentColor: Color {
+        guard hasStarted else { return .clear }
+        switch currentPhase.id {
+        case "warmup": return Color(red: 251/255, green: 146/255, blue: 60/255)
+        case "slow":   return Color(red: 165/255, green: 180/255, blue: 252/255)
+        case "medium": return Color.skyIndigo
+        case "fast":   return Color(red: 139/255, green: 92/255,  blue: 246/255)
+        case "rest":   return Color(red: 52/255,  green: 211/255, blue: 153/255)
+        default:       return .clear
+        }
+    }
+
     private var phaseProgress: Double {
         let phaseFraction = timeLeft > 0
             ? 1.0 - Double(timeLeft) / Double(currentPhase.duration)
@@ -73,6 +88,19 @@ struct PracticeView: View {
         NavigationStack {
             ZStack {
                 Color.skyBg.ignoresSafeArea()
+
+                // Subtle ambient tint that shifts with each phase
+                if hasStarted {
+                    RadialGradient(
+                        colors: [phaseAccentColor.opacity(0.10), .clear],
+                        center: .bottom,
+                        startRadius: 0,
+                        endRadius: 500
+                    )
+                    .ignoresSafeArea()
+                    .animation(.easeInOut(duration: 1.5), value: currentPhaseIndex)
+                    .allowsHitTesting(false)
+                }
 
                 // Phase transition toast
                 VStack {
@@ -266,6 +294,23 @@ struct PracticeView: View {
             }
             .onDisappear {
                 stopTimer()
+                UIApplication.shared.isIdleTimerDisabled = false
+            }
+            .onChange(of: isActive) { active in
+                UIApplication.shared.isIdleTimerDisabled = active
+            }
+            .onChange(of: scenePhase) { phase in
+                if phase == .background, isActive {
+                    backgroundEntryDate = Date()
+                } else if phase == .active, let bgDate = backgroundEntryDate {
+                    backgroundEntryDate = nil
+                    guard isActive else { return }
+                    // Accurately account for elapsed time while phone was locked
+                    let elapsed = Int(Date().timeIntervalSince(bgDate))
+                    elapsedSeconds += elapsed
+                    timeLeft = max(0, timeLeft - elapsed)
+                    if timeLeft == 0 { advancePhase() }
+                }
             }
         }
     }

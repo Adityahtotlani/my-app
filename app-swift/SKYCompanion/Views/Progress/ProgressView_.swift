@@ -8,6 +8,7 @@ struct ProgressView_: View {
     @State private var moodTrend: [MoodPoint] = []
     @State private var isLoading = true
     @State private var selectedSession: Session?
+    @State private var showAllSessions = false
 
     private var user: User? { store.user }
     private var level: Int   { user?.level ?? store.localLevel }
@@ -29,6 +30,12 @@ struct ProgressView_: View {
         return sessions.reduce(0) { $0 + $1.durationSeconds } / sessions.count / 60
     }
     private var personalBest: Int { user?.maxStreak ?? store.localMaxStreak }
+    private var totalPracticeTime: String {
+        let secs = sessions.reduce(0) { $0 + $1.durationSeconds }
+        let h = secs / 3600; let m = (secs % 3600) / 60
+        if h > 0 { return "\(h)h \(m)m" }
+        return m == 0 ? "—" : "\(m)m"
+    }
 
     var body: some View {
         NavigationStack {
@@ -41,16 +48,16 @@ struct ProgressView_: View {
                     ScrollView {
                         VStack(spacing: 20) {
                             Text("Your Progress")
-                                .font(.system(size: 28, weight: .heavy)).foregroundColor(.skyText)
+                                .font(.largeTitle.weight(.heavy))
+                                .foregroundColor(.skyText)
                                 .frame(maxWidth: .infinity, alignment: .leading)
 
-                            // Streak calendar
                             StreakCalendarView(practicedDates: practicedDates).skyCard()
 
                             // Mood chart
                             VStack(alignment: .leading, spacing: 12) {
                                 Text("Mood Trend (Last 14 Sessions)")
-                                    .font(.system(size: 16, weight: .bold)).foregroundColor(.skySub)
+                                    .font(.callout.weight(.bold)).foregroundColor(.skySub)
 
                                 if moodTrend.isEmpty {
                                     Text("Select a mood after each session to track your trend.")
@@ -81,7 +88,7 @@ struct ProgressView_: View {
                                                 if let v = value.as(Double.self) {
                                                     let idx = Int(v) - 1
                                                     if emojis.indices.contains(idx) {
-                                                        Text(emojis[idx]).font(.system(size: 14))
+                                                        Text(emojis[idx]).font(.caption)
                                                     }
                                                 }
                                             }
@@ -96,13 +103,13 @@ struct ProgressView_: View {
                             // XP / Level
                             VStack(alignment: .leading, spacing: 12) {
                                 Text("XP & Level")
-                                    .font(.system(size: 16, weight: .bold)).foregroundColor(.skySub)
+                                    .font(.callout.weight(.bold)).foregroundColor(.skySub)
 
                                 HStack(alignment: .firstTextBaseline, spacing: 8) {
                                     Text("Lvl \(level)")
-                                        .font(.system(size: 22, weight: .heavy)).foregroundColor(.skyIndigo)
+                                        .font(.title2.weight(.heavy)).foregroundColor(.skyIndigo)
                                     Text(levelName)
-                                        .font(.system(size: 18, weight: .semibold)).foregroundColor(.skyText)
+                                        .font(.headline).foregroundColor(.skyText)
                                 }
 
                                 GeometryReader { geo in
@@ -127,26 +134,53 @@ struct ProgressView_: View {
                             }
                             .skyCard()
 
-                            // Stats row
-                            HStack(spacing: 12) {
-                                MiniStatCard(label: "Total Sessions", value: "\(sessions.count)")
-                                MiniStatCard(label: "Avg. Duration",  value: "\(avgDurationMins)m")
-                                MiniStatCard(label: "Personal Best",  value: "\(personalBest) days")
+                            if sessions.isEmpty { EmptyProgressCard() }
+
+                            // Stats 2×2 grid
+                            LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 12) {
+                                MiniStatCard(label: "Total Sessions", value: sessions.isEmpty ? "—" : "\(sessions.count)")
+                                MiniStatCard(label: "Total Hours",    value: totalPracticeTime)
+                                MiniStatCard(label: "Avg. Duration",  value: avgDurationMins == 0 ? "—" : "\(avgDurationMins)m")
+                                MiniStatCard(label: "Personal Best",  value: personalBest == 0 ? "—" : "\(personalBest) days")
                             }
 
-                            // Recent sessions
+                            // Session history
                             if !sessions.isEmpty {
                                 VStack(alignment: .leading, spacing: 12) {
-                                    Text("Recent Sessions")
-                                        .font(.system(size: 16, weight: .bold))
-                                        .foregroundColor(.skySub)
+                                    HStack {
+                                        Text("Sessions")
+                                            .font(.callout.weight(.bold))
+                                            .foregroundColor(.skySub)
+                                        Spacer()
+                                        Text("\(sessions.count) total")
+                                            .font(.caption)
+                                            .foregroundColor(.skyMuted)
+                                    }
 
+                                    let displayed = Array(sessions.reversed()
+                                        .prefix(showAllSessions ? sessions.count : 5))
                                     VStack(spacing: 8) {
-                                        ForEach(sessions.reversed().prefix(5)) { session in
+                                        ForEach(displayed) { session in
                                             Button { selectedSession = session } label: {
                                                 SessionRow(session: session)
                                             }
                                             .buttonStyle(.plain)
+                                        }
+                                    }
+
+                                    if sessions.count > 5 {
+                                        Button {
+                                            withAnimation(.easeInOut(duration: 0.25)) {
+                                                showAllSessions.toggle()
+                                            }
+                                        } label: {
+                                            Text(showAllSessions
+                                                 ? "Show less"
+                                                 : "Show all \(sessions.count) sessions")
+                                                .font(.footnote.weight(.medium))
+                                                .foregroundColor(.skyIndigo)
+                                                .frame(maxWidth: .infinity)
+                                                .padding(.top, 4)
                                         }
                                     }
                                 }
@@ -155,6 +189,12 @@ struct ProgressView_: View {
                         }
                         .padding(.horizontal, 20)
                         .padding(.bottom, 30)
+                    }
+                    .refreshable {
+                        if !store.token.isEmpty { await store.refreshUser() }
+                        sessions       = store.localSessionsAsSessions
+                        practicedDates = store.localPracticedDates
+                        moodTrend      = store.localMoodTrend
                     }
                 }
             }
@@ -165,6 +205,7 @@ struct ProgressView_: View {
             }
             .sheet(item: $selectedSession) { session in
                 SessionDetailSheet(session: session)
+                    .presentationDragIndicator(.visible)
             }
         }
     }
@@ -219,16 +260,11 @@ private struct SessionRow: View {
         return out.string(from: date)
     }
 
-    private var duration: String {
-        "\(session.durationSeconds / 60)m"
-    }
-
     var body: some View {
         VStack(alignment: .leading, spacing: 6) {
             HStack(spacing: 12) {
-                // Type badge
                 Text(session.type == "full" ? "Full" : "Short")
-                    .font(.system(size: 11, weight: .semibold))
+                    .font(.caption2.weight(.semibold))
                     .foregroundColor(session.type == "full" ? .skyIndigo : Color(red: 22/255, green: 163/255, blue: 74/255))
                     .padding(.horizontal, 8).padding(.vertical, 3)
                     .background(session.type == "full"
@@ -238,9 +274,9 @@ private struct SessionRow: View {
 
                 VStack(alignment: .leading, spacing: 2) {
                     Text(formattedDate)
-                        .font(.system(size: 14, weight: .medium))
+                        .font(.footnote.weight(.medium))
                         .foregroundColor(.skyText)
-                    Text(duration)
+                    Text("\(session.durationSeconds / 60)m")
                         .font(.caption)
                         .foregroundColor(.skyMuted)
                 }
@@ -248,13 +284,13 @@ private struct SessionRow: View {
                 Spacer()
 
                 if !moodEmoji.isEmpty {
-                    Text(moodEmoji).font(.system(size: 20))
+                    Text(moodEmoji).font(.title3)
                 }
             }
 
             if let note = session.note, !note.isEmpty {
                 Text(note)
-                    .font(.system(size: 13))
+                    .font(.footnote)
                     .foregroundColor(.skySub)
                     .lineLimit(2)
                     .padding(.leading, 4)
@@ -274,8 +310,8 @@ private struct MiniStatCard: View {
 
     var body: some View {
         VStack(spacing: 6) {
-            Text(label).font(.system(size: 11)).foregroundColor(.skySub).multilineTextAlignment(.center)
-            Text(value).font(.system(size: 18, weight: .bold)).foregroundColor(.skyText)
+            Text(label).font(.caption2).foregroundColor(.skySub).multilineTextAlignment(.center)
+            Text(value).font(.title2.weight(.bold)).foregroundColor(.skyText)
         }
         .frame(maxWidth: .infinity)
         .padding(16)
@@ -316,10 +352,9 @@ private struct SessionDetailSheet: View {
 
                 ScrollView {
                     VStack(alignment: .leading, spacing: 20) {
-                        // Type badge + date
                         HStack {
                             Text(session.type == "full" ? "Full Session" : "Short Session")
-                                .font(.system(size: 13, weight: .semibold))
+                                .font(.footnote.weight(.semibold))
                                 .foregroundColor(session.type == "full"
                                     ? .skyIndigo
                                     : Color(red: 22/255, green: 163/255, blue: 74/255))
@@ -332,21 +367,20 @@ private struct SessionDetailSheet: View {
                         }
 
                         Text(formattedDate)
-                            .font(.system(size: 26, weight: .heavy))
+                            .font(.title.weight(.heavy))
                             .foregroundColor(.skyText)
 
                         HStack(spacing: 12) {
-                            DetailStatPill(icon: "clock", label: "Duration",  value: "\(session.durationSeconds / 60) min")
-                            DetailStatPill(icon: "star.fill", label: "XP Earned", value: "+\(xpEarned) XP")
+                            DetailStatPill(icon: "clock",      label: "Duration",  value: "\(session.durationSeconds / 60) min")
+                            DetailStatPill(icon: "star.fill",  label: "XP Earned", value: "+\(xpEarned) XP")
                         }
 
                         if !moodLabel.isEmpty {
                             VStack(alignment: .leading, spacing: 6) {
                                 Text("Mood After Practice")
-                                    .font(.system(size: 14, weight: .semibold))
+                                    .font(.footnote.weight(.semibold))
                                     .foregroundColor(.skySub)
-                                Text(moodLabel)
-                                    .font(.system(size: 22))
+                                Text(moodLabel).font(.title2)
                             }
                             .skyCard()
                         }
@@ -354,10 +388,10 @@ private struct SessionDetailSheet: View {
                         if let note = session.note, !note.isEmpty {
                             VStack(alignment: .leading, spacing: 8) {
                                 Label("Reflection", systemImage: "quote.opening")
-                                    .font(.system(size: 14, weight: .semibold))
+                                    .font(.footnote.weight(.semibold))
                                     .foregroundColor(.skyIndigo)
                                 Text(note)
-                                    .font(.system(size: 15))
+                                    .font(.subheadline)
                                     .foregroundColor(.skyText)
                                     .lineSpacing(5)
                             }
@@ -379,6 +413,30 @@ private struct SessionDetailSheet: View {
     }
 }
 
+private struct EmptyProgressCard: View {
+    var body: some View {
+        VStack(spacing: 16) {
+            Image(systemName: "wind").font(.largeTitle).foregroundColor(.skyIndigo)
+            Text("Your journey begins here")
+                .font(.headline)
+                .foregroundColor(.skyText)
+            Text("Complete your first SKY session to start tracking your streak, mood, and progress over time.")
+                .font(.footnote)
+                .foregroundColor(.skySub)
+                .multilineTextAlignment(.center)
+                .lineSpacing(4)
+            Text("Head to the Practice tab to begin →")
+                .font(.footnote.weight(.semibold))
+                .foregroundColor(.skyIndigo)
+        }
+        .padding(24)
+        .frame(maxWidth: .infinity)
+        .background(Color.skyIndigoLight)
+        .clipShape(RoundedRectangle(cornerRadius: 20))
+        .shadow(color: Color.skyIndigo.opacity(0.08), radius: 10, y: 2)
+    }
+}
+
 private struct DetailStatPill: View {
     let icon: String
     let label: String
@@ -386,15 +444,9 @@ private struct DetailStatPill: View {
 
     var body: some View {
         VStack(spacing: 6) {
-            Image(systemName: icon)
-                .foregroundColor(.skyIndigo)
-                .font(.system(size: 18))
-            Text(value)
-                .font(.system(size: 16, weight: .bold))
-                .foregroundColor(.skyText)
-            Text(label)
-                .font(.caption)
-                .foregroundColor(.skySub)
+            Image(systemName: icon).foregroundColor(.skyIndigo).font(.headline)
+            Text(value).font(.callout.weight(.bold)).foregroundColor(.skyText)
+            Text(label).font(.caption).foregroundColor(.skySub)
         }
         .frame(maxWidth: .infinity)
         .padding(16)

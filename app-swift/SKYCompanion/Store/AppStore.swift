@@ -271,11 +271,12 @@ class AppStore: ObservableObject {
             let type: String
             let durationSeconds: Int
             let moodScore: Int?
+            let note: String?
         }
         do {
             let _: LogSessionResponse = try await APIService.request(
                 path: "/api/sessions/log", method: "POST",
-                body: Body(type: type, durationSeconds: durationSeconds, moodScore: moodScore),
+                body: Body(type: type, durationSeconds: durationSeconds, moodScore: moodScore, note: note),
                 token: storedToken
             )
             await refreshUser()
@@ -321,6 +322,19 @@ class AppStore: ObservableObject {
         storedReminderMin  = minute
         reminderHour       = hour
         reminderMinute     = minute
+    }
+
+    func setIntention(_ value: String) {
+        intention       = value
+        storedIntention = value
+    }
+
+    func resetAllLocalData() {
+        localSessions          = []
+        localSatsangCheckIns   = []
+        UserDefaults.standard.removeObject(forKey: "local_sessions")
+        UserDefaults.standard.removeObject(forKey: "satsang_checkins")
+        NotificationService.cancelStreakRiskReminder()
     }
 }
 

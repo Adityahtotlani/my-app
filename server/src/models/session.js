@@ -1,8 +1,8 @@
 const Session = (pg) => ({
-  async create({ userId, type, durationSeconds, hrvDelta, moodScore }) {
+  async create({ userId, type, durationSeconds, moodScore, note }) {
     const { rows } = await pg.query(
-      'INSERT INTO sessions (user_id, type, duration_seconds, hrv_delta, mood_score) VALUES ($1, $2, $3, $4, $5) RETURNING *',
-      [userId, type, durationSeconds, hrvDelta, moodScore]
+      'INSERT INTO sessions (user_id, type, duration_seconds, mood_score, note) VALUES ($1, $2, $3, $4, $5) RETURNING *',
+      [userId, type, durationSeconds, moodScore ?? null, note ?? null]
     );
     return rows[0];
   },
