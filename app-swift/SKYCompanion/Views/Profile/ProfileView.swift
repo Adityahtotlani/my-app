@@ -11,6 +11,21 @@ struct ProfileView: View {
         ReminderOption(label: "", hour: store.reminderHour, minute: store.reminderMinute).displayTime
     }
 
+    private var localLevelName: String {
+        let names = ["", "Seeker", "Practitioner", "Steady Breather", "Inner Circle", "SKY Guide", "Luminous"]
+        let lvl = user?.level ?? store.localLevel
+        return names.indices.contains(lvl) ? names[lvl] : "Seeker"
+    }
+    private var currentStreak: Int { user?.currentStreak ?? store.localCurrentStreak }
+    private var maxStreak: Int     { user?.maxStreak ?? store.localMaxStreak }
+    private var totalXP: Int       { user?.totalXP ?? store.localTotalXP }
+    private var level: Int         { user?.level ?? store.localLevel }
+
+    private func formatMinutes(_ total: Int) -> String {
+        if total < 60 { return "\(total)m" }
+        return "\(total / 60)h \(total % 60)m"
+    }
+
     var body: some View {
         NavigationStack {
             ZStack {
@@ -25,11 +40,11 @@ struct ProfileView: View {
                                 Image(systemName: "person.fill")
                                     .foregroundColor(.skyIndigo).font(.system(size: 36))
                             }
-                            Text(user?.email ?? "")
+                            Text(user?.email ?? (store.localName.isEmpty ? "Practitioner" : store.localName))
                                 .font(.system(size: 20, weight: .bold)).foregroundColor(.skyText)
 
                             HStack(spacing: 8) {
-                                BadgeView(text: user?.levelName ?? "Seeker", bg: Color.skyIndigoLight, fg: .skyIndigo)
+                                BadgeView(text: localLevelName, bg: Color.skyIndigoLight, fg: .skyIndigo)
                                 BadgeView(text: "Verified Practitioner",
                                           bg: Color(red: 220/255, green: 252/255, blue: 231/255),
                                           fg: Color(red: 22/255, green: 101/255, blue: 52/255))
@@ -38,6 +53,22 @@ struct ProfileView: View {
                         .frame(maxWidth: .infinity)
                         .padding(.vertical, 40)
                         .background(Color.white)
+
+                        // Stats summary
+                        HStack(spacing: 12) {
+                            MiniStatPill(icon: "flame.fill", iconColor: .red,
+                                         value: "\(currentStreak)", label: "Streak")
+                            MiniStatPill(icon: "checkmark.circle.fill", iconColor: .skyIndigo,
+                                         value: "\(store.localSessions.count)", label: "Sessions")
+                            MiniStatPill(icon: "star.fill", iconColor: .yellow,
+                                         value: "\(totalXP)", label: "Total XP")
+                        }
+                        .padding(.horizontal, 20)
+                        .padding(.top, 16)
+
+                        // Achievements
+                        AchievementsSection(achievements: store.achievements)
+                            .padding(.horizontal, 20)
 
                         // Settings list
                         VStack(alignment: .leading, spacing: 10) {
@@ -57,9 +88,11 @@ struct ProfileView: View {
                             ProfileRow(icon: "bell.fill", label: "Notifications", value: "Enabled")
                             ProfileRow(icon: "lock.shield.fill", label: "Privacy", value: "Managed")
                             ProfileRow(icon: "flame.fill", label: "Personal Best Streak",
-                                       value: "\(user?.maxStreak ?? 0) days")
+                                       value: "\(maxStreak) days")
                             ProfileRow(icon: "star.fill", label: "Level",
-                                       value: "\(user?.levelName ?? "Seeker") (Lvl \(user?.level ?? 1))")
+                                       value: "\(localLevelName) (Lvl \(level))")
+                            ProfileRow(icon: "clock.fill", label: "Total Practice Time",
+                                       value: formatMinutes(store.localTotalMinutes))
                         }
                         .padding(.horizontal, 20)
 
@@ -75,7 +108,7 @@ struct ProfileView: View {
                             .foregroundColor(Color(red: 239/255, green: 68/255, blue: 68/255))
                             .frame(maxWidth: .infinity).padding(15)
                             .background(Color(red: 254/255, green: 226/255, blue: 226/255))
-                            .cornerRadius(12)
+                            .clipShape(RoundedRectangle(cornerRadius: 12))
                         }
                         .padding(.horizontal, 20)
                         .padding(.top, 30)
@@ -83,7 +116,7 @@ struct ProfileView: View {
                     }
                 }
             }
-            .navigationBarHidden(true)
+            .toolbar(.hidden, for: .navigationBar)
             .alert("Log Out", isPresented: $showLogoutAlert) {
                 Button("Cancel", role: .cancel) {}
                 Button("Log Out", role: .destructive) { store.logout() }
@@ -124,7 +157,7 @@ private struct ProfileRow: View {
             }
             .padding(15)
             .background(Color.white)
-            .cornerRadius(12)
+            .clipShape(RoundedRectangle(cornerRadius: 12))
         }
         .disabled(action == nil)
     }
@@ -139,7 +172,86 @@ private struct BadgeView: View {
         Text(text).font(.system(size: 12, weight: .semibold))
             .foregroundColor(fg)
             .padding(.horizontal, 12).padding(.vertical, 4)
-            .background(bg).cornerRadius(20)
+            .background(bg, in: Capsule())
+    }
+}
+
+private struct MiniStatPill: View {
+    let icon: String
+    let iconColor: Color
+    let value: String
+    let label: String
+
+    var body: some View {
+        VStack(spacing: 6) {
+            Image(systemName: icon).foregroundColor(iconColor).font(.title3)
+            Text(value).font(.system(size: 18, weight: .bold)).foregroundColor(.skyText)
+            Text(label).font(.caption2).foregroundColor(.skySub)
+        }
+        .frame(maxWidth: .infinity)
+        .padding(.vertical, 14)
+        .background(Color.white)
+        .clipShape(RoundedRectangle(cornerRadius: 16))
+        .shadow(color: .black.opacity(0.05), radius: 8, y: 2)
+    }
+}
+
+private struct AchievementsSection: View {
+    let achievements: [Achievement]
+
+    private var earnedCount: Int { achievements.filter { $0.earned }.count }
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            HStack {
+                Text("ACHIEVEMENTS")
+                    .font(.caption).fontWeight(.bold)
+                    .foregroundColor(.skySub).kerning(1)
+                Spacer()
+                Text("\(earnedCount) of \(achievements.count)")
+                    .font(.caption)
+                    .foregroundColor(.skyMuted)
+            }
+            .padding(.top, 20)
+
+            LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 12) {
+                ForEach(achievements) { badge in
+                    AchievementCard(badge: badge)
+                }
+            }
+        }
+    }
+}
+
+private struct AchievementCard: View {
+    let badge: Achievement
+
+    var body: some View {
+        VStack(spacing: 8) {
+            ZStack {
+                Circle()
+                    .fill(badge.earned ? Color.skyIndigoLight : Color(UIColor.systemGray6))
+                    .frame(width: 52, height: 52)
+                Image(systemName: badge.icon)
+                    .font(.system(size: 22))
+                    .foregroundColor(badge.earned ? .skyIndigo : Color(UIColor.systemGray3))
+            }
+            Text(badge.title)
+                .font(.system(size: 12, weight: .semibold))
+                .foregroundColor(badge.earned ? .skyText : .skyMuted)
+                .multilineTextAlignment(.center)
+            Text(badge.description)
+                .font(.system(size: 10))
+                .foregroundColor(.skyMuted)
+                .multilineTextAlignment(.center)
+                .lineSpacing(2)
+        }
+        .frame(maxWidth: .infinity)
+        .padding(14)
+        .background(Color.white)
+        .clipShape(RoundedRectangle(cornerRadius: 16))
+        .shadow(color: .black.opacity(badge.earned ? 0.06 : 0.02), radius: 8, y: 2)
+        .opacity(badge.earned ? 1.0 : 0.5)
     }
 }
 
@@ -167,7 +279,7 @@ private struct ReminderSheet: View {
                     }
                     .padding(18)
                     .background(isSelected ? Color.skyIndigo : Color.skyBg)
-                    .cornerRadius(14)
+                    .clipShape(RoundedRectangle(cornerRadius: 14))
                 }
             }
 

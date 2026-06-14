@@ -4,18 +4,8 @@ struct ContentView: View {
     @EnvironmentObject var store: AppStore
 
     var body: some View {
-        Group {
-            if store.isAuthenticated {
-                if store.hasOnboarded {
-                    MainTabView()
-                } else {
-                    OnboardingView()
-                }
-            } else {
-                AuthNavigationView()
-            }
-        }
-        .animation(.easeInOut, value: store.isAuthenticated)
-        .animation(.easeInOut, value: store.hasOnboarded)
+        // AUTH BYPASSED FOR TESTING — restore original logic when done:
+        // if store.isAuthenticated { if store.hasOnboarded { MainTabView() } else { OnboardingView() } } else { AuthNavigationView() }
+        MainTabView()
     }
 }

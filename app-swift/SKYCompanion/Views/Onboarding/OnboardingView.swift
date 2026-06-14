@@ -5,6 +5,7 @@ private let intentions = ["Reduce Stress", "Better Sleep", "More Energy", "Inner
 struct OnboardingView: View {
     @EnvironmentObject var store: AppStore
     @State private var step = 0
+    @State private var name: String = ""
     @State private var selectedIntention: String?
     @State private var selectedReminderIdx: Int?
 
@@ -14,8 +15,9 @@ struct OnboardingView: View {
 
             TabView(selection: $step) {
                 welcomeStep.tag(0)
-                intentionStep.tag(1)
-                reminderStep.tag(2)
+                nameStep.tag(1)
+                intentionStep.tag(2)
+                reminderStep.tag(3)
             }
             .tabViewStyle(.page(indexDisplayMode: .never))
             .animation(.easeInOut, value: step)
@@ -45,7 +47,33 @@ struct OnboardingView: View {
         .padding(.horizontal, 24)
     }
 
-    // MARK: Step 1 — Intention
+    // MARK: Step 1 — Name
+    private var nameStep: some View {
+        VStack(spacing: 32) {
+            Spacer()
+            VStack(spacing: 8) {
+                Text("What should we\ncall you?")
+                    .font(.system(size: 28, weight: .bold))
+                    .foregroundColor(.skyText)
+                    .multilineTextAlignment(.center)
+                Text("This is how you'll appear in your practice.")
+                    .font(.system(size: 15))
+                    .foregroundColor(.skySub)
+                    .multilineTextAlignment(.center)
+            }
+
+            SKYTextField(placeholder: "Your first name", text: $name)
+
+            Spacer()
+            SKYPrimaryButton(title: "Continue", disabled: name.trimmingCharacters(in: .whitespaces).isEmpty) {
+                step = 2
+            }
+            .padding(.bottom, 40)
+        }
+        .padding(.horizontal, 24)
+    }
+
+    // MARK: Step 2 — Intention
     private var intentionStep: some View {
         VStack(spacing: 32) {
             Spacer()
@@ -59,14 +87,14 @@ struct OnboardingView: View {
 
             Spacer()
             SKYPrimaryButton(title: "Continue", disabled: selectedIntention == nil) {
-                step = 2
+                step = 3
             }
             .padding(.bottom, 40)
         }
         .padding(.horizontal, 24)
     }
 
-    // MARK: Step 2 — Reminder
+    // MARK: Step 3 — Reminder
     private var reminderStep: some View {
         VStack(spacing: 24) {
             Spacer()
@@ -87,10 +115,14 @@ struct OnboardingView: View {
             SKYPrimaryButton(title: "Begin Practice", disabled: selectedReminderIdx == nil) {
                 guard let idx = selectedReminderIdx,
                       let intention = selectedIntention else { return }
+                let trimmedName = name.trimmingCharacters(in: .whitespaces)
+                if !trimmedName.isEmpty { store.localName = trimmedName }
                 let chosen = reminderOptions[idx]
                 Task {
-                    await NotificationService.requestPermission()
-                    await NotificationService.scheduleReminder(hour: chosen.hour, minute: chosen.minute)
+                    let granted = await NotificationService.requestPermission()
+                    if granted {
+                        await NotificationService.scheduleReminder(hour: chosen.hour, minute: chosen.minute)
+                    }
                     store.completeOnboarding(intention: intention, hour: chosen.hour, minute: chosen.minute)
                 }
             }
@@ -118,7 +150,7 @@ private struct OnboardingBullet: View {
         }
         .padding(16)
         .background(Color.skyBg)
-        .cornerRadius(14)
+        .clipShape(RoundedRectangle(cornerRadius: 14))
     }
 }
 
@@ -137,7 +169,7 @@ private struct FlowLayout: View {
                     .padding(.vertical, 12)
                     .padding(.horizontal, 18)
                     .background(isSelected ? Color.skyIndigo : Color(UIColor.systemGray6))
-                    .cornerRadius(24)
+                    .clipShape(Capsule())
             }
         }
     }
@@ -161,11 +193,11 @@ private struct ReminderCard: View {
             }
             .padding(18)
             .background(isSelected ? Color.skyIndigo : Color.skyBg)
-            .cornerRadius(16)
-            .overlay(
+            .clipShape(RoundedRectangle(cornerRadius: 16))
+            .overlay {
                 RoundedRectangle(cornerRadius: 16)
                     .stroke(isSelected ? Color.skyIndigo : Color.clear, lineWidth: 2)
-            )
+            }
         }
     }
 

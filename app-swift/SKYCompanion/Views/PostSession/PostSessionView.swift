@@ -22,88 +22,167 @@ struct PostSessionView: View {
     private let insight = insights.randomElement()!
     private var xpEarned: Int { sessionType == "full" ? 100 : 50 }
 
+    @State private var showCelebration = false
+    @State private var celebrationStreak = 0
+
     var body: some View {
         ZStack {
             Color.skyBg.ignoresSafeArea()
 
-            VStack(spacing: 20) {
-                Spacer()
+            if showCelebration {
+                celebrationView
+                    .transition(.asymmetric(
+                        insertion: .scale(scale: 0.92).combined(with: .opacity),
+                        removal: .opacity
+                    ))
+            } else {
+                summaryView
+                    .transition(.opacity)
+            }
+        }
+        .animation(.spring(response: 0.5, dampingFraction: 0.75), value: showCelebration)
+        .toolbar(.hidden, for: .navigationBar)
+    }
 
-                Text("Session Complete")
-                    .font(.system(size: 28, weight: .bold))
+    // MARK: - Summary screen
+
+    private var summaryView: some View {
+        VStack(spacing: 20) {
+            Spacer()
+
+            Text("Session Complete")
+                .font(.system(size: 28, weight: .bold))
+                .foregroundColor(.skyText)
+
+            // Summary card
+            VStack(alignment: .leading, spacing: 12) {
+                Text("SUMMARY")
+                    .font(.caption).fontWeight(.semibold)
+                    .foregroundColor(.skySub).kerning(0.5)
+
+                HStack {
+                    VStack(spacing: 4) {
+                        Text(formatDuration(durationSeconds))
+                            .font(.system(size: 22, weight: .bold)).foregroundColor(.skyIndigo)
+                        Text("Duration").font(.caption).foregroundColor(.skyMuted)
+                    }
+                    .frame(maxWidth: .infinity)
+
+                    Divider().frame(height: 40)
+
+                    VStack(spacing: 4) {
+                        Text("+\(xpEarned) XP")
+                            .font(.system(size: 22, weight: .bold)).foregroundColor(.skyIndigo)
+                        Text("Earned").font(.caption).foregroundColor(.skyMuted)
+                    }
+                    .frame(maxWidth: .infinity)
+                }
+            }
+            .skyCard()
+
+            // Insight card
+            VStack(alignment: .leading, spacing: 8) {
+                Text("SCIENCE INSIGHT")
+                    .font(.caption).fontWeight(.semibold)
+                    .foregroundColor(.skyIndigo).kerning(0.5)
+                Text(insight)
+                    .font(.system(size: 15))
+                    .foregroundColor(.skyText)
+                    .lineSpacing(4)
+            }
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .padding(20)
+            .background(Color.skyIndigoLight)
+            .clipShape(RoundedRectangle(cornerRadius: 20))
+            .shadow(color: .black.opacity(0.05), radius: 10, y: 2)
+
+            // Mood picker
+            VStack(spacing: 16) {
+                Text("How do you feel?")
+                    .font(.system(size: 18, weight: .semibold))
                     .foregroundColor(.skyText)
 
-                // Summary card
-                VStack(alignment: .leading, spacing: 12) {
-                    Text("SUMMARY")
-                        .font(.caption).fontWeight(.semibold)
-                        .foregroundColor(.skySub).kerning(0.5)
-
-                    HStack {
-                        VStack(spacing: 4) {
-                            Text(formatDuration(durationSeconds))
-                                .font(.system(size: 22, weight: .bold)).foregroundColor(.skyIndigo)
-                            Text("Duration").font(.caption).foregroundColor(.skyMuted)
-                        }
-                        .frame(maxWidth: .infinity)
-
-                        Divider().frame(height: 40)
-
-                        VStack(spacing: 4) {
-                            Text("+\(xpEarned) XP")
-                                .font(.system(size: 22, weight: .bold)).foregroundColor(.skyIndigo)
-                            Text("Earned").font(.caption).foregroundColor(.skyMuted)
-                        }
-                        .frame(maxWidth: .infinity)
-                    }
-                }
-                .skyCard()
-
-                // Insight card
-                VStack(alignment: .leading, spacing: 8) {
-                    Text("SCIENCE INSIGHT")
-                        .font(.caption).fontWeight(.semibold)
-                        .foregroundColor(.skyIndigo).kerning(0.5)
-                    Text(insight)
-                        .font(.system(size: 15))
-                        .foregroundColor(.skyText)
-                        .lineSpacing(4)
-                }
-                .frame(maxWidth: .infinity, alignment: .leading)
-                .skyCard()
-                .background(Color.skyIndigoLight)
-                .cornerRadius(16)
-
-                // Mood picker
-                VStack(spacing: 16) {
-                    Text("How do you feel?")
-                        .font(.system(size: 18, weight: .semibold))
-                        .foregroundColor(.skyText)
-
-                    HStack(spacing: 12) {
-                        ForEach(moods, id: \.score) { mood in
-                            Button {
-                                Task { await handleMood(score: mood.score) }
-                            } label: {
-                                Text(mood.emoji).font(.system(size: 30))
-                                    .frame(width: 56, height: 56)
-                                    .background(Color.white)
-                                    .clipShape(Circle())
-                                    .shadow(color: .black.opacity(0.08), radius: 6, y: 2)
-                            }
+                HStack(spacing: 12) {
+                    ForEach(moods, id: \.score) { mood in
+                        Button {
+                            Task { await handleMood(score: mood.score) }
+                        } label: {
+                            Text(mood.emoji).font(.system(size: 30))
+                                .frame(width: 56, height: 56)
+                                .background(Color.white)
+                                .clipShape(Circle())
+                                .shadow(color: .black.opacity(0.08), radius: 6, y: 2)
                         }
                     }
                 }
 
-                Spacer()
+                Button("Skip") {
+                    Task { await handleSkip() }
+                }
+                .font(.system(size: 14))
+                .foregroundColor(.skyMuted)
+                .padding(.top, 4)
             }
-            .padding(.horizontal, 24)
+
+            Spacer()
         }
-        .navigationBarHidden(true)
+        .padding(.horizontal, 24)
     }
+
+    // MARK: - Celebration screen
+
+    private var celebrationView: some View {
+        VStack(spacing: 0) {
+            Spacer()
+
+            // Icon
+            Text(celebrationStreak > 1 ? "🔥" : "✨")
+                .font(.system(size: 80))
+                .padding(.bottom, 16)
+
+            // Streak
+            Text(celebrationStreak > 0
+                 ? "\(celebrationStreak) Day\(celebrationStreak == 1 ? "" : "") Streak!"
+                 : "Session Logged!")
+                .font(.system(size: 34, weight: .heavy))
+                .foregroundColor(.skyText)
+                .multilineTextAlignment(.center)
+                .padding(.bottom, 8)
+
+            Text(celebrationStreak > 0 ? "Keep the momentum going." : "Every practice counts.")
+                .font(.system(size: 16))
+                .foregroundColor(.skySub)
+                .padding(.bottom, 24)
+
+            // XP badge
+            HStack(spacing: 8) {
+                Image(systemName: "star.fill").foregroundColor(.yellow)
+                Text("+\(xpEarned) XP Earned")
+                    .font(.system(size: 16, weight: .semibold))
+                    .foregroundColor(Color(red: 67/255, green: 56/255, blue: 202/255))
+            }
+            .padding(.horizontal, 24).padding(.vertical, 12)
+            .background(Color.skyIndigoLight)
+            .clipShape(Capsule())
+
+            Spacer()
+
+            SKYPrimaryButton(title: "Back to Home") { dismiss() }
+                .padding(.horizontal, 24)
+                .padding(.bottom, 40)
+        }
+    }
+
+    // MARK: - Helpers
 
     private func handleMood(score: Int) async {
         await store.logSession(type: sessionType, durationSeconds: durationSeconds, moodScore: score)
+        celebrationStreak = store.localCurrentStreak
+        showCelebration = true
+    }
+
+    private func handleSkip() async {
+        await store.logSession(type: sessionType, durationSeconds: durationSeconds, moodScore: nil)
         dismiss()
     }
 

@@ -15,6 +15,13 @@ struct Session: Codable, Identifiable {
     }
 }
 
+struct LocalSession: Codable {
+    let date: String            // "yyyy-MM-dd"
+    let type: String            // "full" | "short"
+    let durationSeconds: Int
+    let moodScore: Int?
+}
+
 struct MoodPoint: Identifiable {
     let id: Int
     let day: Int

@@ -6,7 +6,7 @@ struct SkyCardModifier: ViewModifier {
         content
             .padding(20)
             .background(Color.white)
-            .cornerRadius(20)
+            .clipShape(RoundedRectangle(cornerRadius: 20))
             .shadow(color: .black.opacity(0.05), radius: 10, y: 2)
     }
 }
@@ -31,7 +31,7 @@ struct SKYPrimaryButton: View {
                 .frame(maxWidth: .infinity)
                 .padding(.vertical, 16)
                 .background(disabled ? Color.skyIndigo.opacity(0.5) : Color.skyIndigo)
-                .cornerRadius(16)
+                .clipShape(RoundedRectangle(cornerRadius: 16))
         }
         .disabled(disabled)
     }
@@ -53,8 +53,10 @@ struct SKYTextField: View {
         }
         .padding(16)
         .background(Color.white)
-        .cornerRadius(14)
-        .overlay(RoundedRectangle(cornerRadius: 14).stroke(Color(UIColor.systemGray4), lineWidth: 1))
+        .clipShape(RoundedRectangle(cornerRadius: 14))
+        .overlay {
+            RoundedRectangle(cornerRadius: 14).stroke(Color(UIColor.systemGray4), lineWidth: 1)
+        }
         .font(.system(size: 16))
     }
 }
