@@ -176,6 +176,11 @@ struct HomeView: View {
                             }
                         }
 
+                        // First-session welcome card
+                        if store.localSessions.isEmpty {
+                            FirstSessionCard()
+                        }
+
                         // This Week strip
                         Text("This Week")
                             .font(.system(size: 20, weight: .bold))
@@ -305,6 +310,33 @@ private struct WeekStripView: View {
                         }
                     }
                     .frame(maxWidth: .infinity)
+                }
+            }
+        }
+        .skyCard()
+    }
+}
+
+private struct FirstSessionCard: View {
+    var body: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            Label("Your Journey Starts Here", systemImage: "wind")
+                .font(.system(size: 14, weight: .semibold))
+                .foregroundColor(.skyIndigo)
+
+            Text("Your first SKY session takes about 35 minutes and guides you through 5 breathing phases. Even one session creates measurable change in your nervous system.")
+                .font(.system(size: 14))
+                .foregroundColor(.skySub)
+                .lineSpacing(3)
+
+            HStack(spacing: 8) {
+                ForEach(["35 min", "5 phases", "Eyes closed"], id: \.self) { tip in
+                    Text(tip)
+                        .font(.system(size: 11, weight: .semibold))
+                        .foregroundColor(.skyIndigo)
+                        .padding(.horizontal, 9).padding(.vertical, 4)
+                        .background(Color.skyIndigoLight)
+                        .clipShape(Capsule())
                 }
             }
         }

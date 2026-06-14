@@ -35,6 +35,12 @@ struct BreathCircleView: View {
                     .frame(width: C * 0.63, height: C * 0.63)
                     .shadow(color: .black.opacity(0.10), radius: 12, y: 4)
 
+                // Pulse ring — expands outward on inhale, fades on exhale
+                Circle()
+                    .stroke(Color.skyIndigo.opacity(expanded ? 0.22 : 0), lineWidth: 2)
+                    .frame(width: expanded ? C * 0.70 : C * 0.40,
+                           height: expanded ? C * 0.70 : C * 0.40)
+
                 Circle()
                     .fill(isPaused ? Color.skySub : Color.skyIndigo)
                     .frame(width: indigoDiam, height: indigoDiam)

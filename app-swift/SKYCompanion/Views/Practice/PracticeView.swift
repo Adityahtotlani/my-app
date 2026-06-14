@@ -194,6 +194,17 @@ struct PracticeView: View {
                         }
                         .padding(.horizontal, 24)
                         .padding(.top, 20)
+
+                        // Phase preview chips
+                        ScrollView(.horizontal, showsIndicators: false) {
+                            HStack(spacing: 8) {
+                                ForEach(Array(phases.enumerated()), id: \.offset) { _, phase in
+                                    PhaseChip(phase: phase)
+                                }
+                            }
+                            .padding(.horizontal, 24)
+                        }
+                        .padding(.top, 10)
                     }
 
                     // Breath circle
@@ -344,6 +355,34 @@ struct PracticeView: View {
 
     private func formatTime(_ seconds: Int) -> String {
         String(format: "%d:%02d", seconds / 60, seconds % 60)
+    }
+}
+
+private struct PhaseChip: View {
+    let phase: Phase
+
+    private var durationLabel: String {
+        String(format: "%d:%02d", phase.duration / 60, phase.duration % 60)
+    }
+    private var icon: String {
+        phase.isResting ? "moon.fill" : "wind"
+    }
+
+    var body: some View {
+        HStack(spacing: 5) {
+            Image(systemName: icon)
+                .font(.system(size: 9))
+                .foregroundColor(phase.isResting ? .skySub : .skyIndigo)
+            Text(phase.name.replacingOccurrences(of: "SKY - ", with: ""))
+                .font(.system(size: 11, weight: .medium))
+                .foregroundColor(.skySub)
+            Text(durationLabel)
+                .font(.system(size: 11).monospacedDigit())
+                .foregroundColor(.skyMuted)
+        }
+        .padding(.horizontal, 10).padding(.vertical, 6)
+        .background(Color(UIColor.secondarySystemBackground))
+        .clipShape(Capsule())
     }
 }
 

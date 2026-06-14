@@ -77,16 +77,26 @@ class AppStore: ObservableObject {
 
     // MARK: - Local Session Tracking
 
-    func saveLocalSession(type: String, durationSeconds: Int, moodScore: Int?) {
+    func saveLocalSession(type: String, durationSeconds: Int, moodScore: Int?, note: String? = nil) {
         let record = LocalSession(
             date: isoFormatter.string(from: Date()),
             type: type,
             durationSeconds: durationSeconds,
-            moodScore: moodScore
+            moodScore: moodScore,
+            note: note
         )
         localSessions.append(record)
         if let data = try? JSONEncoder().encode(localSessions) {
             UserDefaults.standard.set(data, forKey: "local_sessions")
+        }
+        // Practiced today — streak is safe, cancel the at-risk nudge
+        NotificationService.cancelStreakRiskReminder()
+        // Re-arm for tomorrow if they have a streak worth protecting
+        let streak = localCurrentStreak
+        if streak >= 2 {
+            Task {
+                await NotificationService.scheduleStreakRiskReminder(streak: streak)
+            }
         }
     }
 
@@ -202,7 +212,7 @@ class AppStore: ObservableObject {
     var localSessionsAsSessions: [Session] {
         localSessions.enumerated().map { i, s in
             Session(id: i, type: s.type, durationSeconds: s.durationSeconds,
-                    moodScore: s.moodScore, completedAt: s.date)
+                    moodScore: s.moodScore, completedAt: s.date, note: s.note)
         }
     }
 
@@ -253,9 +263,8 @@ class AppStore: ObservableObject {
 
     // MARK: - Sessions
 
-    func logSession(type: String, durationSeconds: Int, moodScore: Int?) async {
-        // Always persist locally first
-        saveLocalSession(type: type, durationSeconds: durationSeconds, moodScore: moodScore)
+    func logSession(type: String, durationSeconds: Int, moodScore: Int?, note: String? = nil) async {
+        saveLocalSession(type: type, durationSeconds: durationSeconds, moodScore: moodScore, note: note)
 
         guard !storedToken.isEmpty else { return }
         struct Body: Encodable {

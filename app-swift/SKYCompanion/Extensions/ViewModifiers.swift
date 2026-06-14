@@ -5,7 +5,7 @@ struct SkyCardModifier: ViewModifier {
     func body(content: Content) -> some View {
         content
             .padding(20)
-            .background(Color.white)
+            .background(Color(UIColor.secondarySystemBackground))
             .clipShape(RoundedRectangle(cornerRadius: 20))
             .shadow(color: .black.opacity(0.05), radius: 10, y: 2)
     }
@@ -52,7 +52,7 @@ struct SKYTextField: View {
             }
         }
         .padding(16)
-        .background(Color.white)
+        .background(Color(UIColor.secondarySystemBackground))
         .clipShape(RoundedRectangle(cornerRadius: 14))
         .overlay {
             RoundedRectangle(cornerRadius: 14).stroke(Color(UIColor.systemGray4), lineWidth: 1)

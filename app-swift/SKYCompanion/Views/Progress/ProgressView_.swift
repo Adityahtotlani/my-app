@@ -7,6 +7,7 @@ struct ProgressView_: View {
     @State private var practicedDates: Set<String> = []
     @State private var moodTrend: [MoodPoint] = []
     @State private var isLoading = true
+    @State private var selectedSession: Session?
 
     private var user: User? { store.user }
     private var level: Int   { user?.level ?? store.localLevel }
@@ -142,7 +143,10 @@ struct ProgressView_: View {
 
                                     VStack(spacing: 8) {
                                         ForEach(sessions.reversed().prefix(5)) { session in
-                                            SessionRow(session: session)
+                                            Button { selectedSession = session } label: {
+                                                SessionRow(session: session)
+                                            }
+                                            .buttonStyle(.plain)
                                         }
                                     }
                                 }
@@ -158,6 +162,9 @@ struct ProgressView_: View {
             .task { await loadAll() }
             .onChange(of: store.localSessions.count) { _ in
                 Task { await loadAll() }
+            }
+            .sheet(item: $selectedSession) { session in
+                SessionDetailSheet(session: session)
             }
         }
     }
@@ -217,30 +224,40 @@ private struct SessionRow: View {
     }
 
     var body: some View {
-        HStack(spacing: 12) {
-            // Type badge
-            Text(session.type == "full" ? "Full" : "Short")
-                .font(.system(size: 11, weight: .semibold))
-                .foregroundColor(session.type == "full" ? .skyIndigo : Color(red: 22/255, green: 163/255, blue: 74/255))
-                .padding(.horizontal, 8).padding(.vertical, 3)
-                .background(session.type == "full"
-                    ? Color.skyIndigoLight
-                    : Color(red: 240/255, green: 253/255, blue: 244/255))
-                .clipShape(Capsule())
+        VStack(alignment: .leading, spacing: 6) {
+            HStack(spacing: 12) {
+                // Type badge
+                Text(session.type == "full" ? "Full" : "Short")
+                    .font(.system(size: 11, weight: .semibold))
+                    .foregroundColor(session.type == "full" ? .skyIndigo : Color(red: 22/255, green: 163/255, blue: 74/255))
+                    .padding(.horizontal, 8).padding(.vertical, 3)
+                    .background(session.type == "full"
+                        ? Color.skyIndigoLight
+                        : Color(red: 240/255, green: 253/255, blue: 244/255))
+                    .clipShape(Capsule())
 
-            VStack(alignment: .leading, spacing: 2) {
-                Text(formattedDate)
-                    .font(.system(size: 14, weight: .medium))
-                    .foregroundColor(.skyText)
-                Text(duration)
-                    .font(.caption)
-                    .foregroundColor(.skyMuted)
+                VStack(alignment: .leading, spacing: 2) {
+                    Text(formattedDate)
+                        .font(.system(size: 14, weight: .medium))
+                        .foregroundColor(.skyText)
+                    Text(duration)
+                        .font(.caption)
+                        .foregroundColor(.skyMuted)
+                }
+
+                Spacer()
+
+                if !moodEmoji.isEmpty {
+                    Text(moodEmoji).font(.system(size: 20))
+                }
             }
 
-            Spacer()
-
-            if !moodEmoji.isEmpty {
-                Text(moodEmoji).font(.system(size: 20))
+            if let note = session.note, !note.isEmpty {
+                Text(note)
+                    .font(.system(size: 13))
+                    .foregroundColor(.skySub)
+                    .lineLimit(2)
+                    .padding(.leading, 4)
             }
         }
         .padding(.vertical, 8)
@@ -262,8 +279,127 @@ private struct MiniStatCard: View {
         }
         .frame(maxWidth: .infinity)
         .padding(16)
-        .background(Color.white)
+        .background(Color(UIColor.secondarySystemBackground))
         .clipShape(RoundedRectangle(cornerRadius: 20))
         .shadow(color: .black.opacity(0.05), radius: 10, y: 2)
+    }
+}
+
+private struct SessionDetailSheet: View {
+    let session: Session
+    @Environment(\.dismiss) var dismiss
+
+    private var moodLabel: String {
+        switch session.moodScore {
+        case 1: return "😔  Tough"
+        case 2: return "😕  Low"
+        case 3: return "😐  Okay"
+        case 4: return "🙂  Good"
+        case 5: return "😊  Great"
+        default: return ""
+        }
+    }
+
+    private var formattedDate: String {
+        let f = DateFormatter(); f.dateFormat = "yyyy-MM-dd"
+        guard let date = f.date(from: session.completedAt) else { return session.completedAt }
+        let out = DateFormatter(); out.dateStyle = .long; out.timeStyle = .none
+        return out.string(from: date)
+    }
+
+    private var xpEarned: Int { session.type == "full" ? 100 : 50 }
+
+    var body: some View {
+        NavigationStack {
+            ZStack {
+                Color.skyBg.ignoresSafeArea()
+
+                ScrollView {
+                    VStack(alignment: .leading, spacing: 20) {
+                        // Type badge + date
+                        HStack {
+                            Text(session.type == "full" ? "Full Session" : "Short Session")
+                                .font(.system(size: 13, weight: .semibold))
+                                .foregroundColor(session.type == "full"
+                                    ? .skyIndigo
+                                    : Color(red: 22/255, green: 163/255, blue: 74/255))
+                                .padding(.horizontal, 10).padding(.vertical, 4)
+                                .background(session.type == "full"
+                                    ? Color.skyIndigoLight
+                                    : Color(red: 240/255, green: 253/255, blue: 244/255))
+                                .clipShape(Capsule())
+                            Spacer()
+                        }
+
+                        Text(formattedDate)
+                            .font(.system(size: 26, weight: .heavy))
+                            .foregroundColor(.skyText)
+
+                        HStack(spacing: 12) {
+                            DetailStatPill(icon: "clock", label: "Duration",  value: "\(session.durationSeconds / 60) min")
+                            DetailStatPill(icon: "star.fill", label: "XP Earned", value: "+\(xpEarned) XP")
+                        }
+
+                        if !moodLabel.isEmpty {
+                            VStack(alignment: .leading, spacing: 6) {
+                                Text("Mood After Practice")
+                                    .font(.system(size: 14, weight: .semibold))
+                                    .foregroundColor(.skySub)
+                                Text(moodLabel)
+                                    .font(.system(size: 22))
+                            }
+                            .skyCard()
+                        }
+
+                        if let note = session.note, !note.isEmpty {
+                            VStack(alignment: .leading, spacing: 8) {
+                                Label("Reflection", systemImage: "quote.opening")
+                                    .font(.system(size: 14, weight: .semibold))
+                                    .foregroundColor(.skyIndigo)
+                                Text(note)
+                                    .font(.system(size: 15))
+                                    .foregroundColor(.skyText)
+                                    .lineSpacing(5)
+                            }
+                            .skyCard()
+                        }
+                    }
+                    .padding(20)
+                }
+            }
+            .navigationTitle("Session Detail")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .topBarTrailing) {
+                    Button("Done") { dismiss() }
+                        .foregroundColor(.skyIndigo)
+                }
+            }
+        }
+    }
+}
+
+private struct DetailStatPill: View {
+    let icon: String
+    let label: String
+    let value: String
+
+    var body: some View {
+        VStack(spacing: 6) {
+            Image(systemName: icon)
+                .foregroundColor(.skyIndigo)
+                .font(.system(size: 18))
+            Text(value)
+                .font(.system(size: 16, weight: .bold))
+                .foregroundColor(.skyText)
+            Text(label)
+                .font(.caption)
+                .foregroundColor(.skySub)
+        }
+        .frame(maxWidth: .infinity)
+        .padding(16)
+        .background(Color(UIColor.secondarySystemBackground))
+        .clipShape(RoundedRectangle(cornerRadius: 16))
+        .shadow(color: .black.opacity(0.04), radius: 8, y: 2)
     }
 }

@@ -24,6 +24,9 @@ struct PostSessionView: View {
 
     @State private var showCelebration = false
     @State private var celebrationStreak = 0
+    @State private var note: String = ""
+    @State private var newLevel: Int? = nil
+    @State private var newAchievement: Achievement? = nil
 
     var body: some View {
         ZStack {
@@ -96,6 +99,24 @@ struct PostSessionView: View {
             .clipShape(RoundedRectangle(cornerRadius: 20))
             .shadow(color: .black.opacity(0.05), radius: 10, y: 2)
 
+            // Reflection field
+            VStack(alignment: .leading, spacing: 8) {
+                Text("Reflection")
+                    .font(.system(size: 13, weight: .semibold))
+                    .foregroundColor(.skySub)
+                TextField("How was your practice today? (optional)", text: $note, axis: .vertical)
+                    .font(.system(size: 14))
+                    .foregroundColor(.skyText)
+                    .lineLimit(3...5)
+                    .padding(12)
+                    .background(Color.white)
+                    .clipShape(RoundedRectangle(cornerRadius: 12))
+                    .overlay {
+                        RoundedRectangle(cornerRadius: 12)
+                            .stroke(Color(UIColor.systemGray4), lineWidth: 1)
+                    }
+            }
+
             // Mood picker
             VStack(spacing: 16) {
                 Text("How do you feel?")
@@ -135,21 +156,34 @@ struct PostSessionView: View {
         VStack(spacing: 0) {
             Spacer()
 
-            // Icon
-            Text(celebrationStreak > 1 ? "🔥" : "✨")
+            // Icon — trophy if leveled up, fire for streak, sparkle otherwise
+            Text(newLevel != nil ? "🏆" : (celebrationStreak > 1 ? "🔥" : "✨"))
                 .font(.system(size: 80))
                 .padding(.bottom, 16)
 
-            // Streak
-            Text(celebrationStreak > 0
-                 ? "\(celebrationStreak) Day\(celebrationStreak == 1 ? "" : "") Streak!"
-                 : "Session Logged!")
-                .font(.system(size: 34, weight: .heavy))
-                .foregroundColor(.skyText)
-                .multilineTextAlignment(.center)
-                .padding(.bottom, 8)
+            // Primary headline
+            Group {
+                if let lvl = newLevel {
+                    VStack(spacing: 4) {
+                        Text("Level Up!")
+                            .font(.system(size: 34, weight: .heavy))
+                            .foregroundColor(.skyIndigo)
+                        Text(levelName(for: lvl))
+                            .font(.system(size: 20, weight: .semibold))
+                            .foregroundColor(.skySub)
+                    }
+                } else {
+                    Text(celebrationStreak > 0
+                         ? "\(celebrationStreak) Day\(celebrationStreak == 1 ? "" : "s") Streak!"
+                         : "Session Logged!")
+                        .font(.system(size: 34, weight: .heavy))
+                        .foregroundColor(.skyText)
+                        .multilineTextAlignment(.center)
+                }
+            }
+            .padding(.bottom, 8)
 
-            Text(celebrationStreak > 0 ? "Keep the momentum going." : "Every practice counts.")
+            Text(celebrationSubline)
                 .font(.system(size: 16))
                 .foregroundColor(.skySub)
                 .padding(.bottom, 24)
@@ -165,24 +199,77 @@ struct PostSessionView: View {
             .background(Color.skyIndigoLight)
             .clipShape(Capsule())
 
+            // Achievement unlock callout
+            if let badge = newAchievement {
+                HStack(spacing: 12) {
+                    ZStack {
+                        Circle().fill(Color.skyIndigoLight).frame(width: 42, height: 42)
+                        Image(systemName: badge.icon)
+                            .foregroundColor(.skyIndigo).font(.system(size: 18))
+                    }
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text("ACHIEVEMENT UNLOCKED")
+                            .font(.system(size: 10, weight: .bold))
+                            .foregroundColor(.skyIndigo)
+                        Text(badge.title)
+                            .font(.system(size: 15, weight: .semibold))
+                            .foregroundColor(.skyText)
+                        Text(badge.description)
+                            .font(.system(size: 12))
+                            .foregroundColor(.skyMuted)
+                    }
+                    Spacer()
+                }
+                .padding(14)
+                .background(Color.white)
+                .clipShape(RoundedRectangle(cornerRadius: 16))
+                .shadow(color: .black.opacity(0.07), radius: 8, y: 2)
+                .padding(.horizontal, 24)
+                .padding(.top, 20)
+                .transition(.scale(scale: 0.9).combined(with: .opacity))
+            }
+
             Spacer()
 
             SKYPrimaryButton(title: "Back to Home") { dismiss() }
                 .padding(.horizontal, 24)
                 .padding(.bottom, 40)
         }
+        .animation(.spring(response: 0.4, dampingFraction: 0.75), value: newAchievement?.id)
+    }
+
+    private var celebrationSubline: String {
+        if newLevel != nil      { return "You've reached a new level of practice." }
+        if newAchievement != nil { return "A new achievement was unlocked!" }
+        return celebrationStreak > 0 ? "Keep the momentum going." : "Every practice counts."
+    }
+
+    private func levelName(for level: Int) -> String {
+        let names = ["", "Seeker", "Practitioner", "Steady Breather", "Inner Circle", "SKY Guide", "Luminous"]
+        return names.indices.contains(level) ? names[level] : "Seeker"
     }
 
     // MARK: - Helpers
 
     private func handleMood(score: Int) async {
-        await store.logSession(type: sessionType, durationSeconds: durationSeconds, moodScore: score)
+        let trimmed = note.trimmingCharacters(in: .whitespacesAndNewlines)
+        let prevLevel = store.localLevel
+        let prevEarned = Set(store.achievements.filter { $0.earned }.map(\.id))
+
+        await store.logSession(type: sessionType, durationSeconds: durationSeconds,
+                               moodScore: score, note: trimmed.isEmpty ? nil : trimmed)
+
         celebrationStreak = store.localCurrentStreak
+        let afterLevel = store.localLevel
+        if afterLevel > prevLevel { newLevel = afterLevel }
+        newAchievement = store.achievements.first { $0.earned && !prevEarned.contains($0.id) }
         showCelebration = true
     }
 
     private func handleSkip() async {
-        await store.logSession(type: sessionType, durationSeconds: durationSeconds, moodScore: nil)
+        let trimmed = note.trimmingCharacters(in: .whitespacesAndNewlines)
+        await store.logSession(type: sessionType, durationSeconds: durationSeconds,
+                               moodScore: nil, note: trimmed.isEmpty ? nil : trimmed)
         dismiss()
     }
 
