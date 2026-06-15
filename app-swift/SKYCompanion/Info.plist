@@ -3,7 +3,7 @@
 <plist version="1.0">
 <dict>
 	<key>NSHealthShareUsageDescription</key>
-	<string>SKY Companion reads Mindful Minutes from Apple Health.</string>
+	<string>SKY Companion reads heart rate data from Apple Watch, AirPods, and other HRMs to show live BPM during practice and a heart rate summary after each session.</string>
 	<key>NSHealthUpdateUsageDescription</key>
 	<string>SKY Companion writes your SKY Breath sessions to Apple Health as Mindful Minutes.</string>
 	<key>UTExportedTypeDeclarations</key>

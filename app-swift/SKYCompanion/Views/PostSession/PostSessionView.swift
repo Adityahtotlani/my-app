@@ -18,6 +18,7 @@ struct PostSessionView: View {
 
     let sessionType: String
     let durationSeconds: Int
+    let sessionStartDate: Date?
 
     private let insight = insights.randomElement()!
     private var xpEarned: Int { sessionType == "full" ? 100 : 50 }
@@ -27,6 +28,7 @@ struct PostSessionView: View {
     @State private var note: String = ""
     @State private var newLevel: Int? = nil
     @State private var newAchievement: Achievement? = nil
+    @State private var hrSummary: (avg: Double, min: Double, max: Double, count: Int)? = nil
 
     var body: some View {
         ZStack {
@@ -45,6 +47,10 @@ struct PostSessionView: View {
         }
         .animation(.spring(response: 0.5, dampingFraction: 0.75), value: showCelebration)
         .toolbar(.hidden, for: .navigationBar)
+        .task {
+            guard store.healthKitEnabled, let start = sessionStartDate else { return }
+            hrSummary = await HealthKitService.shared.fetchSessionHeartRateSummary(start: start, end: Date())
+        }
     }
 
     // MARK: - Summary screen
@@ -82,6 +88,32 @@ struct PostSessionView: View {
                 }
             }
             .skyCard()
+
+            // Heart rate summary card
+            if store.healthKitEnabled, let hr = hrSummary {
+                VStack(alignment: .leading, spacing: 12) {
+                    HStack(spacing: 6) {
+                        Image(systemName: "heart.fill")
+                            .font(.caption)
+                            .foregroundColor(.red)
+                        Text("HEART RATE")
+                            .font(.caption.weight(.semibold))
+                            .foregroundColor(.skySub)
+                            .kerning(0.5)
+                    }
+                    HStack {
+                        HRStatView(label: "Avg", value: "\(Int(hr.avg.rounded())) BPM")
+                        Divider().frame(height: 40)
+                        HRStatView(label: "Min", value: "\(Int(hr.min.rounded()))")
+                        Divider().frame(height: 40)
+                        HRStatView(label: "Max", value: "\(Int(hr.max.rounded()))")
+                    }
+                    Text("\(hr.count) reading\(hr.count == 1 ? "" : "s") · Apple Watch / AirPods")
+                        .font(.caption2)
+                        .foregroundColor(.skyMuted)
+                }
+                .skyCard()
+            }
 
             // Insight card
             VStack(alignment: .leading, spacing: 8) {
@@ -291,5 +323,22 @@ struct PostSessionView: View {
 
     private func formatDuration(_ seconds: Int) -> String {
         "\(seconds / 60)m \(seconds % 60)s"
+    }
+}
+
+private struct HRStatView: View {
+    let label: String
+    let value: String
+
+    var body: some View {
+        VStack(spacing: 4) {
+            Text(value)
+                .font(.title3.weight(.bold))
+                .foregroundColor(.skyIndigo)
+            Text(label)
+                .font(.caption)
+                .foregroundColor(.skyMuted)
+        }
+        .frame(maxWidth: .infinity)
     }
 }

@@ -42,6 +42,9 @@ struct PracticeView: View {
     @State private var showPhaseToast = false
     @State private var toastTask: Task<Void, Never>?
     @State private var backgroundEntryDate: Date?
+    @State private var sessionStartDate: Date? = nil
+    @State private var currentHR: Double? = nil
+    @State private var hrPollingTask: Task<Void, Never>? = nil
 
     @Environment(\.scenePhase) private var scenePhase
 
@@ -202,6 +205,19 @@ struct PracticeView: View {
                             }
                             .animation(.easeInOut(duration: 0.2), value: isActive)
                         }
+                        if hasStarted && store.healthKitEnabled, let hr = currentHR {
+                            HStack(spacing: 4) {
+                                Image(systemName: "heart.fill")
+                                    .font(.caption2)
+                                    .foregroundColor(.red)
+                                Text("\(Int(hr.rounded())) BPM")
+                                    .font(.caption2.monospacedDigit())
+                                    .foregroundColor(.skySub)
+                                Spacer()
+                            }
+                            .transition(.opacity)
+                            .animation(.easeInOut(duration: 0.4), value: currentHR)
+                        }
                     }
                     .padding(.horizontal, 24)
                     .padding(.top, 16)
@@ -300,7 +316,8 @@ struct PracticeView: View {
             .toolbar(.hidden, for: .navigationBar)
             .navigationDestination(isPresented: $navigateToPostSession) {
                 PostSessionView(sessionType: sessionType == .full ? "full" : "short",
-                                durationSeconds: elapsedSeconds)
+                                durationSeconds: elapsedSeconds,
+                                sessionStartDate: sessionStartDate)
             }
             .confirmationDialog("End session early?", isPresented: $showEndConfirm, titleVisibility: .visible) {
                 Button("End & Log Session", role: .destructive) { endSessionEarly() }
@@ -341,9 +358,11 @@ struct PracticeView: View {
     }
 
     private func startTimer() {
+        if sessionStartDate == nil { sessionStartDate = Date() }
         hasStarted = true
         isActive = true
         UIImpactFeedbackGenerator(style: .medium).impactOccurred()
+        startHRPolling()
         timer = Timer.scheduledTimer(withTimeInterval: 1, repeats: true) { [self] _ in
             if timeLeft > 0 {
                 timeLeft -= 1
@@ -368,6 +387,7 @@ struct PracticeView: View {
         isActive = false
         timer?.invalidate()
         timer = nil
+        stopHRPolling()
     }
 
     private func skipPhase() {
@@ -415,6 +435,22 @@ struct PracticeView: View {
         stopTimer()
         UINotificationFeedbackGenerator().notificationOccurred(.success)
         navigateToPostSession = true
+    }
+
+    private func startHRPolling() {
+        guard store.healthKitEnabled else { return }
+        hrPollingTask?.cancel()
+        hrPollingTask = Task { @MainActor in
+            while !Task.isCancelled {
+                currentHR = await HealthKitService.shared.fetchLatestHeartRate()
+                try? await Task.sleep(for: .seconds(10))
+            }
+        }
+    }
+
+    private func stopHRPolling() {
+        hrPollingTask?.cancel()
+        hrPollingTask = nil
     }
 
     private func formatTime(_ seconds: Int) -> String {
