@@ -47,6 +47,8 @@ class AppStore: ObservableObject {
     @AppStorage("reminder_min")    private var storedReminderMin: Int = 30
     @AppStorage("local_name")      var localName: String = ""
     @AppStorage("user_intention")  private var storedIntention: String = ""
+    @AppStorage("weekly_goal")     var weeklyGoal: Int = 5
+    @AppStorage("healthkit_enabled") var healthKitEnabled: Bool = false
 
     var token: String { storedToken }
 
@@ -88,6 +90,10 @@ class AppStore: ObservableObject {
         localSessions.append(record)
         if let data = try? JSONEncoder().encode(localSessions) {
             UserDefaults.standard.set(data, forKey: "local_sessions")
+        }
+        // Write mindful session to Apple Health if enabled
+        if healthKitEnabled {
+            Task { await HealthKitService.shared.writeMindfulSession(durationSeconds: durationSeconds) }
         }
         // Practiced today — streak is safe, cancel the at-risk nudge
         NotificationService.cancelStreakRiskReminder()

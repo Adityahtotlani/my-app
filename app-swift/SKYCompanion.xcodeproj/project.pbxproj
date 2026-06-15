@@ -16,6 +16,7 @@
 		37F7A1D6C26B490F9F2803C9 /* SKYCompanionApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1240ECEB1E0B488EA54CD9D3 /* SKYCompanionApp.swift */; };
 		6B8FC66E80C5416E8B601F6B /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 41B0574C859E4E16A3A395E2 /* Assets.xcassets */; };
 		83E3F262DC1B4673B4022DD1 /* ProfileView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5424D4511B214D89AFC23609 /* ProfileView.swift */; };
+		8858E2B42FE074D90046C50D /* HealthKitService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8858E2B32FE074D90046C50D /* HealthKitService.swift */; };
 		8C9A5F225B1247A486D8F910 /* ProgressView_.swift in Sources */ = {isa = PBXBuildFile; fileRef = ADC6638FBFE44FD6BF3A4119 /* ProgressView_.swift */; };
 		926BCEF5D6614FC1BC3E88C5 /* AppStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27EAD8E8260F44EFA7686B83 /* AppStore.swift */; };
 		970EF4A19926402780F70A4C /* PracticeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 153D824ABD8B4E268A9E121F /* PracticeView.swift */; };
@@ -50,6 +51,9 @@
 		54E1B3E4AC284358A576F443 /* StreakCalendarView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StreakCalendarView.swift; sourceTree = "<group>"; };
 		6CBC74ED88244FD6898E3673 /* MainTabView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainTabView.swift; sourceTree = "<group>"; };
 		79158772DBBC4AE8B9A4D840 /* BreathCircleView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BreathCircleView.swift; sourceTree = "<group>"; };
+		8858E2B32FE074D90046C50D /* HealthKitService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HealthKitService.swift; sourceTree = "<group>"; };
+		8858E2B52FE076F20046C50D /* SKYCompanion.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = SKYCompanion.entitlements; sourceTree = "<group>"; };
+		8858E2B62FE077290046C50D /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		8C03F15F8B9D474DA9E5FF27 /* LoginView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginView.swift; sourceTree = "<group>"; };
 		A120344D542E4C63B521B4CA /* ViewModifiers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewModifiers.swift; sourceTree = "<group>"; };
 		A31ADF0170C54767A4894F55 /* Color+Sky.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Color+Sky.swift"; sourceTree = "<group>"; };
@@ -90,6 +94,8 @@
 		24FD6DB5E48E44278A8317AC /* SKYCompanion */ = {
 			isa = PBXGroup;
 			children = (
+				8858E2B62FE077290046C50D /* Info.plist */,
+				8858E2B52FE076F20046C50D /* SKYCompanion.entitlements */,
 				E7B9B179ED6F47D4ADD0F9A7 /* Extensions */,
 				F57A36FBE04E49D78178F536 /* Models */,
 				B8DF724191424514B137A0EB /* Services */,
@@ -150,6 +156,7 @@
 			children = (
 				34041964C24D42E09D2D7510 /* APIService.swift */,
 				37420BC208284BE8846B9058 /* NotificationService.swift */,
+				8858E2B32FE074D90046C50D /* HealthKitService.swift */,
 			);
 			path = Services;
 			sourceTree = "<group>";
@@ -319,6 +326,7 @@
 				83E3F262DC1B4673B4022DD1 /* ProfileView.swift in Sources */,
 				8C9A5F225B1247A486D8F910 /* ProgressView_.swift in Sources */,
 				A2AD8FEBA6FE44F983B3F54B /* StreakCalendarView.swift in Sources */,
+				8858E2B42FE074D90046C50D /* HealthKitService.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -330,11 +338,13 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = SKYCompanion/SKYCompanion.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "";
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = SKYCompanion/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = "SKY Companion";
 				INFOPLIST_KEY_NSUserNotificationsUsageDescription = "SKY Companion sends a daily reminder so you don't miss your practice.";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
@@ -425,11 +435,13 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = SKYCompanion/SKYCompanion.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "";
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = SKYCompanion/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = "SKY Companion";
 				INFOPLIST_KEY_NSUserNotificationsUsageDescription = "SKY Companion sends a daily reminder so you don't miss your practice.";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;

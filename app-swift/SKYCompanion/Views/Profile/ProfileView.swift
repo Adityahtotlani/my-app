@@ -8,6 +8,8 @@ struct ProfileView: View {
     @State private var showIntentionSheet = false
     @State private var showNameSheet = false
     @State private var showResetAlert = false
+    @State private var showGoalSheet = false
+    @State private var goalDraft = 5
 
     private var user: User? { store.user }
     private var reminderDisplay: String {
@@ -101,8 +103,41 @@ struct ProfileView: View {
                         }) ?? 0
                         showReminderSheet = true
                     }
+                    settingRow(icon: "target", label: "Weekly Goal",
+                               value: "\(store.weeklyGoal) days/week", valueColor: .skyIndigo) {
+                        goalDraft = store.weeklyGoal
+                        showGoalSheet = true
+                    }
                     infoRow(icon: "bell.fill",       label: "Notifications", value: "Enabled")
                     infoRow(icon: "lock.shield.fill", label: "Privacy",       value: "Managed")
+                }
+
+                // Apple Health sync
+                Section("Apple Health") {
+                    if HealthKitService.shared.isAvailable {
+                        Toggle(isOn: Binding(
+                            get: { store.healthKitEnabled },
+                            set: { newValue in
+                                if newValue {
+                                    Task {
+                                        let granted = await HealthKitService.shared.requestAuthorization()
+                                        store.healthKitEnabled = granted
+                                    }
+                                } else {
+                                    store.healthKitEnabled = false
+                                }
+                            }
+                        )) {
+                            Label("Sync Mindful Minutes", systemImage: "heart.fill")
+                                .foregroundStyle(.primary)
+                        }
+                        .tint(.skyIndigo)
+                        if store.healthKitEnabled {
+                            infoRow(icon: "checkmark.shield.fill", label: "Status", value: "Active")
+                        }
+                    } else {
+                        infoRow(icon: "heart.slash.fill", label: "Apple Health", value: "Not Available")
+                    }
                 }
 
                 // Practice stats — read-only
@@ -157,6 +192,11 @@ struct ProfileView: View {
                 }
                 .presentationDetents([.medium])
                 .presentationDragIndicator(.visible)
+            }
+            .sheet(isPresented: $showGoalSheet) {
+                WeeklyGoalSheet(goal: $goalDraft) { store.weeklyGoal = $0 }
+                    .presentationDetents([.height(340)])
+                    .presentationDragIndicator(.visible)
             }
         }
     }
@@ -334,6 +374,52 @@ private struct ReminderSheet: View {
         case 12:     return "sun.max.fill"
         default:     return "moon.fill"
         }
+    }
+}
+
+private struct WeeklyGoalSheet: View {
+    @Binding var goal: Int
+    @Environment(\.dismiss) var dismiss
+    let onSave: (Int) -> Void
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 24) {
+            Text("Weekly Practice Goal")
+                .font(.title3.weight(.bold))
+                .foregroundColor(.skyText)
+                .padding(.top, 4)
+
+            Text("How many days per week do you want to practice SKY?")
+                .font(.subheadline)
+                .foregroundColor(.skySub)
+                .lineSpacing(3)
+
+            HStack {
+                Spacer()
+                VStack(spacing: 10) {
+                    Text("\(goal)")
+                        .font(.system(size: 64, weight: .bold).monospacedDigit())
+                        .foregroundColor(.skyIndigo)
+                    Text("day\(goal == 1 ? "" : "s") per week")
+                        .font(.subheadline)
+                        .foregroundColor(.skySub)
+                    Stepper("", value: $goal, in: 1...7)
+                        .labelsHidden()
+                        .tint(.skyIndigo)
+                }
+                Spacer()
+            }
+            .padding(20)
+            .background(Color.skyIndigoLight)
+            .clipShape(RoundedRectangle(cornerRadius: 16))
+
+            Spacer()
+
+            SKYPrimaryButton(title: "Save") { onSave(goal); dismiss() }
+            Button("Cancel") { dismiss() }
+                .font(.subheadline).foregroundColor(.skyMuted).frame(maxWidth: .infinity)
+        }
+        .padding(24)
     }
 }
 

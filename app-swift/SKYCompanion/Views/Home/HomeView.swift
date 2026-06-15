@@ -62,6 +62,19 @@ struct HomeView: View {
         }.reduce(0) { $0 + $1.durationSeconds / 60 }
     }
 
+    private var sessionsThisWeek: Int {
+        let cal = Calendar.current
+        let today = Date()
+        let weekday = cal.component(.weekday, from: today)
+        let daysFromMonday = weekday == 1 ? 6 : weekday - 2
+        guard let monday = cal.date(byAdding: .day, value: -daysFromMonday, to: today) else { return 0 }
+        let f = DateFormatter(); f.dateFormat = "yyyy-MM-dd"
+        return store.localSessions.filter {
+            guard let d = f.date(from: $0.date) else { return false }
+            return cal.startOfDay(for: d) >= cal.startOfDay(for: monday)
+        }.count
+    }
+
     private var xpProgress: Double {
         guard level < 6 else { return 1.0 }
         let prev = levelThresholds[level - 1]
@@ -220,13 +233,13 @@ struct HomeView: View {
                                 .foregroundColor(.skyText)
                             Spacer()
                             if minutesThisWeek > 0 {
-                                Text("\(minutesThisWeek) min")
+                                Text("\(sessionsThisWeek) session\(sessionsThisWeek == 1 ? "" : "s") · \(minutesThisWeek) min")
                                     .font(.footnote.weight(.semibold))
                                     .foregroundColor(.skyIndigo)
                             }
                         }
 
-                        WeekStripView(practicedDates: store.localPracticedDates)
+                        WeekStripView(practicedDates: store.localPracticedDates, weeklyGoal: store.weeklyGoal)
 
                         // Milestone card
                         if let m = activeMilestone {
@@ -312,6 +325,7 @@ private struct StatCard: View {
 
 private struct WeekStripView: View {
     let practicedDates: Set<String>
+    let weeklyGoal: Int
 
     private let formatter: DateFormatter = {
         let f = DateFormatter(); f.dateFormat = "yyyy-MM-dd"; return f
@@ -336,9 +350,15 @@ private struct WeekStripView: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
-            Text("Practiced \(practicedThisWeek) of 7 days")
-                .font(.footnote)
-                .foregroundColor(.skySub)
+            if practicedThisWeek >= weeklyGoal {
+                Label("Goal reached! \(practicedThisWeek) of \(weeklyGoal) days", systemImage: "checkmark.circle.fill")
+                    .font(.footnote.weight(.medium))
+                    .foregroundColor(Color(red: 22/255, green: 163/255, blue: 74/255))
+            } else {
+                Text("Practiced \(practicedThisWeek) of \(weeklyGoal) days")
+                    .font(.footnote)
+                    .foregroundColor(.skySub)
+            }
 
             HStack(spacing: 6) {
                 ForEach(Array(weekDays.enumerated()), id: \.offset) { _, entry in
