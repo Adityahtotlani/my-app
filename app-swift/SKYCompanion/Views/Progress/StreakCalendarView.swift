@@ -39,16 +39,16 @@ struct StreakCalendarView: View {
             HStack {
                 VStack(alignment: .leading, spacing: 2) {
                     Text("Practice Calendar")
-                        .font(.system(size: 16, weight: .bold)).foregroundColor(.skySub)
+                        .font(.callout.weight(.bold)).foregroundColor(.skySub)
                     Text(dateRangeLabel)
-                        .font(.system(size: 11)).foregroundColor(.skyMuted)
+                        .font(.caption2).foregroundColor(.skyMuted)
                 }
                 Spacer()
                 VStack(alignment: .trailing, spacing: 2) {
                     Text("\(practicedDates.count)")
-                        .font(.system(size: 16, weight: .bold)).foregroundColor(.skyIndigo)
+                        .font(.callout.weight(.bold)).foregroundColor(.skyIndigo)
                     Text("days practiced")
-                        .font(.system(size: 11)).foregroundColor(.skyMuted)
+                        .font(.caption2).foregroundColor(.skyMuted)
                 }
             }
 

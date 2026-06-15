@@ -119,6 +119,7 @@ struct HomeView: View {
                                     .background(Color.skyIndigoLight)
                                     .clipShape(Circle())
                             }
+                            .accessibilityLabel("Share streak")
                             .padding(.top, 6)
                         }
                         .padding(.top, 8)
@@ -270,6 +271,9 @@ struct HomeView: View {
                     }
                     .padding(.horizontal, 20)
                     .padding(.bottom, 30)
+                }
+                .refreshable {
+                    await store.refreshUser()
                 }
             }
             .toolbar(.hidden, for: .navigationBar)

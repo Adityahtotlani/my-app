@@ -106,7 +106,7 @@ struct PracticeView: View {
                 VStack {
                     if showPhaseToast {
                         Text(toastMessage)
-                            .font(.system(size: 14, weight: .semibold))
+                            .font(.footnote.weight(.semibold))
                             .foregroundColor(.white)
                             .padding(.horizontal, 20).padding(.vertical, 10)
                             .background(Color.skyIndigo.opacity(0.9))
@@ -125,11 +125,11 @@ struct PracticeView: View {
                     // Phase name + timer — animated on phase change via .id
                     VStack(spacing: 6) {
                         Text(currentPhase.name)
-                            .font(.system(size: 22, weight: .bold))
+                            .font(.title2.weight(.bold))
                             .foregroundColor(.skyText)
                         if let guidance = phaseGuidance {
                             Text(guidance)
-                                .font(.system(size: 13))
+                                .font(.footnote)
                                 .foregroundColor(.skyMuted)
                                 .transition(.opacity)
                         }
@@ -185,7 +185,7 @@ struct PracticeView: View {
 
                         HStack {
                             Text("Phase \(currentPhaseIndex + 1) of \(phases.count)")
-                                .font(.system(size: 11))
+                                .font(.caption2)
                                 .foregroundColor(.skyMuted)
                             Spacer()
                         }
@@ -193,11 +193,11 @@ struct PracticeView: View {
                         if hasStarted {
                             HStack {
                                 Text(isActive ? "In progress" : "Paused")
-                                    .font(.system(size: 11))
+                                    .font(.caption2)
                                     .foregroundColor(isActive ? Color.skyIndigo : .skyMuted)
                                 Spacer()
                                 Text("Elapsed: \(formatTime(elapsedSeconds))")
-                                    .font(.system(size: 11))
+                                    .font(.caption2)
                                     .foregroundColor(.skyMuted)
                             }
                             .animation(.easeInOut(duration: 0.2), value: isActive)
@@ -249,7 +249,7 @@ struct PracticeView: View {
                         Button("End Session Early") {
                             showEndConfirm = true
                         }
-                        .font(.system(size: 13, weight: .medium))
+                        .font(.footnote.weight(.medium))
                         .foregroundColor(.skyMuted)
                         .padding(.bottom, 8)
                     }
@@ -265,6 +265,7 @@ struct PracticeView: View {
                                 .clipShape(Circle())
                                 .shadow(color: Color.skyIndigo.opacity(0.3), radius: 10, y: 4)
                         }
+                        .accessibilityLabel(isActive ? "Pause" : (hasStarted ? "Resume" : "Start"))
 
                         Button(action: skipPhase) {
                             Image(systemName: "forward.fill")
@@ -274,6 +275,7 @@ struct PracticeView: View {
                                 .background(Color(UIColor.systemGray5))
                                 .clipShape(Circle())
                         }
+                        .accessibilityLabel("Skip to next phase")
                     }
                     .padding(.bottom, 40)
                 }
@@ -416,13 +418,13 @@ private struct PhaseChip: View {
     var body: some View {
         HStack(spacing: 5) {
             Image(systemName: icon)
-                .font(.system(size: 9))
+                .font(.caption2)
                 .foregroundColor(phase.isResting ? .skySub : .skyIndigo)
             Text(phase.name.replacingOccurrences(of: "SKY - ", with: ""))
-                .font(.system(size: 11, weight: .medium))
+                .font(.caption2.weight(.medium))
                 .foregroundColor(.skySub)
             Text(durationLabel)
-                .font(.system(size: 11).monospacedDigit())
+                .font(.caption2.monospacedDigit())
                 .foregroundColor(.skyMuted)
         }
         .padding(.horizontal, 10).padding(.vertical, 6)
@@ -441,7 +443,7 @@ private struct SessionTypeButton: View {
         Button(action: action) {
             VStack(spacing: 4) {
                 Text(title)
-                    .font(.system(size: 15, weight: .semibold))
+                    .font(.subheadline.weight(.semibold))
                     .foregroundColor(isSelected ? .skyIndigo : .skySub)
                 Text(subtitle)
                     .font(.caption)
@@ -449,7 +451,7 @@ private struct SessionTypeButton: View {
             }
             .frame(maxWidth: .infinity)
             .padding(.vertical, 14)
-            .background(isSelected ? Color.skyIndigoLight : Color.white)
+            .background(isSelected ? Color.skyIndigoLight : Color(UIColor.secondarySystemBackground))
             .clipShape(RoundedRectangle(cornerRadius: 12))
             .overlay {
                 RoundedRectangle(cornerRadius: 12)

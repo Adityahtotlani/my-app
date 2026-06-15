@@ -125,6 +125,7 @@ struct PostSessionView: View {
 
                 HStack(spacing: 12) {
                     ForEach(moods, id: \.score) { mood in
+                        let moodNames = ["", "Difficult", "Low", "Okay", "Good", "Great"]
                         Button {
                             Task { await handleMood(score: mood.score) }
                         } label: {
@@ -134,6 +135,7 @@ struct PostSessionView: View {
                                 .clipShape(Circle())
                                 .shadow(color: .black.opacity(0.08), radius: 6, y: 2)
                         }
+                        .accessibilityLabel(moodNames.indices.contains(mood.score) ? moodNames[mood.score] : "Mood \(mood.score)")
                     }
                 }
 
