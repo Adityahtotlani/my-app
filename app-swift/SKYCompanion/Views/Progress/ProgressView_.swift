@@ -36,6 +36,9 @@ struct ProgressView_: View {
         if h > 0 { return "\(h)h \(m)m" }
         return m == 0 ? "—" : "\(m)m"
     }
+    private var sessionsWithNotes: [Session] {
+        Array(sessions.reversed().filter { $0.note?.isEmpty == false }.prefix(5))
+    }
 
     var body: some View {
         NavigationStack {
@@ -142,6 +145,13 @@ struct ProgressView_: View {
                                 MiniStatCard(label: "Total Hours",    value: totalPracticeTime)
                                 MiniStatCard(label: "Avg. Duration",  value: avgDurationMins == 0 ? "—" : "\(avgDurationMins)m")
                                 MiniStatCard(label: "Personal Best",  value: personalBest == 0 ? "—" : "\(personalBest) days")
+                            }
+
+                            // Reflections
+                            if !sessionsWithNotes.isEmpty {
+                                ReflectionsCard(reflections: sessionsWithNotes) { session in
+                                    selectedSession = session
+                                }
                             }
 
                             // Session history
@@ -434,6 +444,51 @@ private struct EmptyProgressCard: View {
         .background(Color.skyIndigoLight)
         .clipShape(RoundedRectangle(cornerRadius: 20))
         .shadow(color: Color.skyIndigo.opacity(0.08), radius: 10, y: 2)
+    }
+}
+
+private struct ReflectionsCard: View {
+    let reflections: [Session]
+    let onTap: (Session) -> Void
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            Label("Reflections", systemImage: "quote.opening")
+                .font(.callout.weight(.bold))
+                .foregroundColor(.skySub)
+
+            VStack(spacing: 0) {
+                ForEach(reflections) { session in
+                    Button { onTap(session) } label: {
+                        VStack(alignment: .leading, spacing: 4) {
+                            Text(formattedDate(session))
+                                .font(.caption.weight(.semibold))
+                                .foregroundColor(.skyMuted)
+                            Text(session.note ?? "")
+                                .font(.footnote)
+                                .foregroundColor(.skyText)
+                                .lineLimit(2)
+                                .lineSpacing(3)
+                                .frame(maxWidth: .infinity, alignment: .leading)
+                        }
+                        .padding(.vertical, 10)
+                    }
+                    .buttonStyle(.plain)
+
+                    if session.id != reflections.last?.id {
+                        Divider().opacity(0.5)
+                    }
+                }
+            }
+        }
+        .skyCard()
+    }
+
+    private func formattedDate(_ session: Session) -> String {
+        let f = DateFormatter(); f.dateFormat = "yyyy-MM-dd"
+        guard let date = f.date(from: session.completedAt) else { return session.completedAt }
+        let out = DateFormatter(); out.dateStyle = .medium; out.timeStyle = .none
+        return out.string(from: date)
     }
 }
 

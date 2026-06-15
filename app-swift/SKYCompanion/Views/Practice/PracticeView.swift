@@ -223,6 +223,23 @@ struct PracticeView: View {
                         .padding(.horizontal, 24)
                         .padding(.top, 20)
 
+                        // Pre-session preparation card
+                        VStack(alignment: .leading, spacing: 10) {
+                            Label("Before you begin", systemImage: "sparkles")
+                                .font(.footnote.weight(.semibold))
+                                .foregroundColor(.skyIndigo)
+                            VStack(alignment: .leading, spacing: 6) {
+                                PrepTip(icon: "figure.mind.and.body", text: "Sit upright · spine tall · eyes closed")
+                                PrepTip(icon: "bell.slash",           text: "Silence notifications for best focus")
+                                PrepTip(icon: "nose",                 text: "Breathe through the nose unless guided")
+                            }
+                        }
+                        .padding(14)
+                        .background(Color.skyIndigoLight)
+                        .clipShape(RoundedRectangle(cornerRadius: 14))
+                        .padding(.horizontal, 24)
+                        .padding(.top, 16)
+
                         // Phase preview chips
                         ScrollView(.horizontal, showsIndicators: false) {
                             HStack(spacing: 8) {
@@ -430,6 +447,23 @@ private struct PhaseChip: View {
         .padding(.horizontal, 10).padding(.vertical, 6)
         .background(Color(UIColor.secondarySystemBackground))
         .clipShape(Capsule())
+    }
+}
+
+private struct PrepTip: View {
+    let icon: String
+    let text: String
+
+    var body: some View {
+        HStack(spacing: 8) {
+            Image(systemName: icon)
+                .font(.caption)
+                .foregroundColor(.skyIndigo)
+                .frame(width: 16)
+            Text(text)
+                .font(.caption)
+                .foregroundColor(.skySub)
+        }
     }
 }
 

@@ -1,4 +1,5 @@
 import SwiftUI
+import UIKit
 
 struct BreathCircleView: View {
     let breathDuration: Double
@@ -123,6 +124,10 @@ struct BreathCircleView: View {
         }
         .onChange(of: breathDuration) { _ in
             if !isResting && !isPaused { stopCycle(); startCycle() }
+        }
+        .onChange(of: isInhaling) { inhaling in
+            guard !isResting && !isPaused else { return }
+            UIImpactFeedbackGenerator(style: .light).impactOccurred(intensity: inhaling ? 0.7 : 0.35)
         }
         .onAppear {
             if isResting && !isPaused { startRestPulse() }
