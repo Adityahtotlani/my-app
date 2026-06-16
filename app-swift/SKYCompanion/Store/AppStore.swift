@@ -30,6 +30,12 @@ struct Achievement: Identifiable {
     let earned: Bool
 }
 
+struct WeeklyCount: Identifiable {
+    let id: Int
+    let label: String
+    let count: Int
+}
+
 @MainActor
 class AppStore: ObservableObject {
     @Published var user: User?
@@ -205,6 +211,10 @@ class AppStore: ObservableObject {
         ]
     }
 
+    var todaySession: LocalSession? {
+        localSessions.last(where: { $0.date == isoFormatter.string(from: Date()) })
+    }
+
     var localMoodTrend: [MoodPoint] {
         let withMood = localSessions.compactMap { s -> (String, Int)? in
             guard let m = s.moodScore else { return nil }
@@ -220,6 +230,31 @@ class AppStore: ObservableObject {
             Session(id: i, type: s.type, durationSeconds: s.durationSeconds,
                     moodScore: s.moodScore, completedAt: s.date, note: s.note)
         }
+    }
+
+    var sessionsPerWeekHistory: [WeeklyCount] {
+        let cal = Calendar.current
+        let today = Date()
+        let dateFmt = DateFormatter(); dateFmt.dateFormat = "M/d"
+        var result = [WeeklyCount]()
+        for weeksBack in (0..<8).reversed() {
+            let refDate = cal.date(byAdding: .weekOfYear, value: -weeksBack, to: today) ?? today
+            let weekday = cal.component(.weekday, from: refDate)
+            let daysFromMonday = weekday == 1 ? 6 : weekday - 2
+            let monday = cal.startOfDay(for: cal.date(byAdding: .day, value: -daysFromMonday, to: refDate) ?? refDate)
+            guard let weekEnd = cal.date(byAdding: .day, value: 7, to: monday) else { continue }
+            let label: String
+            if weeksBack == 0 { label = "This" }
+            else if weeksBack == 1 { label = "Last" }
+            else { label = dateFmt.string(from: monday) }
+            let count = localSessions.filter {
+                guard let d = isoFormatter.date(from: $0.date) else { return false }
+                let day = cal.startOfDay(for: d)
+                return day >= monday && day < weekEnd
+            }.count
+            result.append(WeeklyCount(id: 7 - weeksBack, label: label, count: count))
+        }
+        return result
     }
 
     // MARK: - Auth

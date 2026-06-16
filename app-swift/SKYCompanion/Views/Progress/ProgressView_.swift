@@ -57,6 +57,8 @@ struct ProgressView_: View {
 
                             StreakCalendarView(practicedDates: practicedDates).skyCard()
 
+                            SessionFrequencyCard(weeklyData: store.sessionsPerWeekHistory)
+
                             // Mood chart
                             VStack(alignment: .leading, spacing: 12) {
                                 Text("Mood Trend (Last 14 Sessions)")
@@ -146,6 +148,8 @@ struct ProgressView_: View {
                                 MiniStatCard(label: "Avg. Duration",  value: avgDurationMins == 0 ? "—" : "\(avgDurationMins)m")
                                 MiniStatCard(label: "Personal Best",  value: personalBest == 0 ? "—" : "\(personalBest) days")
                             }
+
+                            AchievementsCard(achievements: store.achievements)
 
                             // Reflections
                             if !sessionsWithNotes.isEmpty {
@@ -508,5 +512,93 @@ private struct DetailStatPill: View {
         .background(Color(UIColor.secondarySystemBackground))
         .clipShape(RoundedRectangle(cornerRadius: 16))
         .shadow(color: .black.opacity(0.04), radius: 8, y: 2)
+    }
+}
+
+private struct SessionFrequencyCard: View {
+    let weeklyData: [WeeklyCount]
+    private var maxCount: Int { weeklyData.map(\.count).max() ?? 0 }
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            Text("Practice Frequency")
+                .font(.callout.weight(.bold)).foregroundColor(.skySub)
+
+            if maxCount == 0 {
+                Text("Complete sessions to see your weekly practice frequency.")
+                    .font(.subheadline).foregroundColor(.skyMuted)
+                    .frame(maxWidth: .infinity).padding(.vertical, 20)
+            } else {
+                Chart(weeklyData) { week in
+                    BarMark(
+                        x: .value("Week", week.label),
+                        y: .value("Sessions", week.count)
+                    )
+                    .foregroundStyle(Color.skyIndigo.gradient)
+                    .cornerRadius(4)
+                }
+                .chartYAxis {
+                    AxisMarks(values: .automatic(desiredCount: 4)) { _ in
+                        AxisGridLine().foregroundStyle(Color(UIColor.systemGray5))
+                        AxisValueLabel()
+                    }
+                }
+                .chartXAxis {
+                    AxisMarks { _ in AxisValueLabel() }
+                }
+                .frame(height: 160)
+            }
+        }
+        .skyCard()
+    }
+}
+
+private struct AchievementsCard: View {
+    let achievements: [Achievement]
+    private var earnedCount: Int { achievements.filter(\.earned).count }
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 16) {
+            HStack {
+                Text("Achievements")
+                    .font(.callout.weight(.bold)).foregroundColor(.skySub)
+                Spacer()
+                Text("\(earnedCount) / \(achievements.count)")
+                    .font(.caption).foregroundColor(.skyMuted)
+            }
+            LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 10) {
+                ForEach(achievements) { badge in
+                    HStack(spacing: 10) {
+                        ZStack {
+                            Circle()
+                                .fill(badge.earned ? Color.skyIndigoLight : Color(UIColor.systemGray6))
+                                .frame(width: 34, height: 34)
+                            Image(systemName: badge.icon)
+                                .font(.caption)
+                                .foregroundColor(badge.earned ? .skyIndigo : Color(UIColor.systemGray3))
+                        }
+                        VStack(alignment: .leading, spacing: 2) {
+                            Text(badge.title)
+                                .font(.caption.weight(.semibold))
+                                .foregroundColor(badge.earned ? .skyText : .skyMuted)
+                                .lineLimit(1)
+                                .minimumScaleFactor(0.8)
+                            Text(badge.description)
+                                .font(.caption2)
+                                .foregroundColor(.skyMuted)
+                                .lineLimit(2)
+                        }
+                    }
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .padding(10)
+                    .background(badge.earned
+                        ? Color.skyIndigoLight.opacity(0.6)
+                        : Color(UIColor.systemGray6))
+                    .clipShape(RoundedRectangle(cornerRadius: 12))
+                    .opacity(badge.earned ? 1.0 : 0.65)
+                }
+            }
+        }
+        .skyCard()
     }
 }

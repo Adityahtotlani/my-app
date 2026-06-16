@@ -1,15 +1,16 @@
 import SwiftUI
+import UserNotifications
 
 struct ProfileView: View {
     @EnvironmentObject var store: AppStore
     @State private var showReminderSheet = false
-    @State private var selectedReminderIdx: Int = 0
     @State private var showLogoutAlert = false
     @State private var showIntentionSheet = false
     @State private var showNameSheet = false
     @State private var showResetAlert = false
     @State private var showGoalSheet = false
     @State private var goalDraft = 5
+    @State private var notifStatus: UNAuthorizationStatus = .notDetermined
 
     private var user: User? { store.user }
     private var reminderDisplay: String {
@@ -98,9 +99,6 @@ struct ProfileView: View {
                     }
                     settingRow(icon: "gearshape.fill", label: "Practice Reminder",
                                value: reminderDisplay, valueColor: .skyIndigo) {
-                        selectedReminderIdx = reminderOptions.firstIndex(where: {
-                            $0.hour == store.reminderHour && $0.minute == store.reminderMinute
-                        }) ?? 0
                         showReminderSheet = true
                     }
                     settingRow(icon: "target", label: "Weekly Goal",
@@ -108,7 +106,26 @@ struct ProfileView: View {
                         goalDraft = store.weeklyGoal
                         showGoalSheet = true
                     }
-                    infoRow(icon: "bell.fill",       label: "Notifications", value: "Enabled")
+                    if notifStatus == .denied {
+                        Button {
+                            if let url = URL(string: UIApplication.openSettingsURLString) {
+                                UIApplication.shared.open(url)
+                            }
+                        } label: {
+                            HStack {
+                                Label("Notifications", systemImage: "bell.slash.fill")
+                                    .foregroundStyle(.primary)
+                                Spacer()
+                                Text("Denied · Open Settings")
+                                    .font(.subheadline)
+                                    .foregroundStyle(.orange)
+                            }
+                        }
+                        .tint(.primary)
+                    } else {
+                        infoRow(icon: "bell.fill", label: "Notifications",
+                                value: notifStatus == .authorized ? "Enabled" : "Not Set Up")
+                    }
                     infoRow(icon: "lock.shield.fill", label: "Privacy",       value: "Managed")
                 }
 
@@ -183,20 +200,23 @@ struct ProfileView: View {
                     .presentationDragIndicator(.visible)
             }
             .sheet(isPresented: $showReminderSheet) {
-                ReminderSheet(selectedIdx: $selectedReminderIdx) { idx in
-                    let chosen = reminderOptions[idx]
+                ReminderSheet(hour: store.reminderHour, minute: store.reminderMinute) { hour, minute in
                     Task {
-                        await NotificationService.scheduleReminder(hour: chosen.hour, minute: chosen.minute)
-                        store.setReminder(hour: chosen.hour, minute: chosen.minute)
+                        await NotificationService.scheduleReminder(hour: hour, minute: minute)
+                        store.setReminder(hour: hour, minute: minute)
                     }
                 }
-                .presentationDetents([.medium])
+                .presentationDetents([.height(520)])
                 .presentationDragIndicator(.visible)
             }
             .sheet(isPresented: $showGoalSheet) {
                 WeeklyGoalSheet(goal: $goalDraft) { store.weeklyGoal = $0 }
                     .presentationDetents([.height(340)])
                     .presentationDragIndicator(.visible)
+            }
+            .task {
+                let settings = await UNUserNotificationCenter.current().notificationSettings()
+                notifStatus = settings.authorizationStatus
             }
         }
     }
@@ -329,36 +349,63 @@ private struct AchievementCard: View {
 }
 
 private struct ReminderSheet: View {
-    @Binding var selectedIdx: Int
+    @State private var time: Date
     @Environment(\.dismiss) var dismiss
-    let onSave: (Int) -> Void
+    let onSave: (Int, Int) -> Void
+
+    init(hour: Int, minute: Int, onSave: @escaping (Int, Int) -> Void) {
+        var comps = DateComponents()
+        comps.hour = hour; comps.minute = minute
+        _time = State(initialValue: Calendar.current.date(from: comps) ?? Date())
+        self.onSave = onSave
+    }
 
     var body: some View {
         VStack(alignment: .leading, spacing: 20) {
-            Text("Change Reminder")
+            Text("Practice Reminder")
                 .font(.title3.weight(.bold))
                 .foregroundColor(.skyText)
                 .padding(.top, 4)
 
-            ForEach(Array(reminderOptions.enumerated()), id: \.offset) { idx, option in
-                let isSelected = selectedIdx == idx
-                Button { selectedIdx = idx } label: {
-                    HStack(spacing: 16) {
-                        Image(systemName: iconName(for: option.hour))
-                            .foregroundColor(isSelected ? .white : .skyIndigo)
-                            .font(.title2)
-                        Text(option.label)
-                            .font(.callout.weight(.semibold))
-                            .foregroundColor(isSelected ? .white : .skyText)
-                        Spacer()
+            DatePicker("Time", selection: $time, displayedComponents: .hourAndMinute)
+                .datePickerStyle(.wheel)
+                .labelsHidden()
+                .tint(.skyIndigo)
+                .frame(maxWidth: .infinity)
+
+            Text("QUICK PICKS")
+                .font(.caption.weight(.bold))
+                .foregroundColor(.skySub)
+                .kerning(1)
+
+            HStack(spacing: 10) {
+                ForEach(reminderOptions) { option in
+                    Button {
+                        var comps = DateComponents()
+                        comps.hour = option.hour; comps.minute = option.minute
+                        if let d = Calendar.current.date(from: comps) { time = d }
+                    } label: {
+                        VStack(spacing: 4) {
+                            Image(systemName: iconName(for: option.hour))
+                                .font(.subheadline)
+                                .foregroundColor(.skyIndigo)
+                            Text(option.displayTime)
+                                .font(.caption.weight(.semibold))
+                                .foregroundColor(.skyIndigo)
+                        }
+                        .frame(maxWidth: .infinity)
+                        .padding(.vertical, 12)
+                        .background(Color.skyIndigoLight)
+                        .clipShape(RoundedRectangle(cornerRadius: 12))
                     }
-                    .padding(18)
-                    .background(isSelected ? Color.skyIndigo : Color.skyBg)
-                    .clipShape(RoundedRectangle(cornerRadius: 14))
                 }
             }
 
-            SKYPrimaryButton(title: "Save") { onSave(selectedIdx); dismiss() }
+            SKYPrimaryButton(title: "Save") {
+                let comps = Calendar.current.dateComponents([.hour, .minute], from: time)
+                onSave(comps.hour ?? 6, comps.minute ?? 30)
+                dismiss()
+            }
 
             Button("Cancel") { dismiss() }
                 .font(.subheadline)

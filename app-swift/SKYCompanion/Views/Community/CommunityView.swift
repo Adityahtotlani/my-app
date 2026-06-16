@@ -1,5 +1,63 @@
 import SwiftUI
 
+private struct BreathStep {
+    let label: String
+    let duration: Double
+    let targetScale: CGFloat  // 1.0 = full inhale, 0.5 = exhale/small
+}
+
+private struct BreathExercise: Identifiable {
+    let id: String
+    let name: String
+    let tagline: String
+    let icon: String
+    let color: Color
+    let pattern: [BreathStep]
+    let totalReps: Int
+}
+
+private let breathExercises: [BreathExercise] = [
+    BreathExercise(
+        id: "coherent",
+        name: "Coherent Breathing",
+        tagline: "~6 breaths/min · maximises HRV",
+        icon: "waveform",
+        color: Color(red: 16/255, green: 185/255, blue: 129/255),
+        pattern: [
+            BreathStep(label: "Inhale", duration: 5, targetScale: 1.0),
+            BreathStep(label: "Exhale", duration: 5, targetScale: 0.5),
+        ],
+        totalReps: 6
+    ),
+    BreathExercise(
+        id: "box",
+        name: "Box Breathing",
+        tagline: "Equal 4s sides · calms the mind",
+        icon: "square",
+        color: Color.skyIndigo,
+        pattern: [
+            BreathStep(label: "Inhale",       duration: 4, targetScale: 1.0),
+            BreathStep(label: "Hold",         duration: 4, targetScale: 1.0),
+            BreathStep(label: "Exhale",       duration: 4, targetScale: 0.5),
+            BreathStep(label: "Hold",         duration: 4, targetScale: 0.5),
+        ],
+        totalReps: 5
+    ),
+    BreathExercise(
+        id: "478",
+        name: "4-7-8 Breathing",
+        tagline: "Deep relaxation · aids sleep",
+        icon: "moon.fill",
+        color: Color(red: 139/255, green: 92/255, blue: 246/255),
+        pattern: [
+            BreathStep(label: "Inhale", duration: 4,  targetScale: 1.0),
+            BreathStep(label: "Hold",   duration: 7,  targetScale: 1.0),
+            BreathStep(label: "Exhale", duration: 8,  targetScale: 0.5),
+        ],
+        totalReps: 4
+    ),
+]
+
 private let breathingTips: [String] = [
     "Practice on an empty stomach — wait 2–3 hours after a meal for best results.",
     "After your session, sit in silence for at least 10 minutes. Integration is half the practice.",
@@ -24,6 +82,7 @@ private let quotes: [(text: String, author: String)] = [
 
 struct CommunityView: View {
     @EnvironmentObject var store: AppStore
+    @State private var selectedExercise: BreathExercise?
 
     private var dailyQuote: (text: String, author: String) {
         let dayOfYear = Calendar.current.ordinality(of: .day, in: .year, for: Date()) ?? 1
@@ -134,6 +193,55 @@ struct CommunityView: View {
                         }
 
                         SatsangCheckInCard()
+
+                        // Breathing library
+                        VStack(alignment: .leading, spacing: 12) {
+                            Label("Breathing Library", systemImage: "lungs.fill")
+                                .font(.caption.weight(.semibold))
+                                .foregroundColor(.skyIndigo)
+                            Text("Quick guided exercises for anytime — no full session required.")
+                                .font(.footnote)
+                                .foregroundColor(.skySub)
+                                .lineSpacing(3)
+                            ForEach(breathExercises) { exercise in
+                                Button { selectedExercise = exercise } label: {
+                                    HStack(spacing: 14) {
+                                        ZStack {
+                                            RoundedRectangle(cornerRadius: 10)
+                                                .fill(exercise.color.opacity(0.15))
+                                                .frame(width: 42, height: 42)
+                                            Image(systemName: exercise.icon)
+                                                .font(.callout)
+                                                .foregroundColor(exercise.color)
+                                        }
+                                        VStack(alignment: .leading, spacing: 3) {
+                                            Text(exercise.name)
+                                                .font(.subheadline.weight(.semibold))
+                                                .foregroundColor(.skyText)
+                                            Text(exercise.tagline)
+                                                .font(.caption)
+                                                .foregroundColor(.skySub)
+                                        }
+                                        Spacer()
+                                        Image(systemName: "play.circle.fill")
+                                            .font(.title2)
+                                            .foregroundColor(exercise.color.opacity(0.8))
+                                    }
+                                    .padding(14)
+                                    .background(Color(UIColor.secondarySystemBackground))
+                                    .clipShape(RoundedRectangle(cornerRadius: 14))
+                                }
+                                .buttonStyle(.plain)
+                            }
+                        }
+                        .padding(16)
+                        .background(Color(UIColor.secondarySystemBackground))
+                        .clipShape(RoundedRectangle(cornerRadius: 20))
+                        .shadow(color: .black.opacity(0.05), radius: 10, y: 2)
+                        .sheet(item: $selectedExercise) { exercise in
+                            QuickBreathSheet(exercise: exercise)
+                                .presentationDragIndicator(.visible)
+                        }
 
                         CommunityLinkCard(
                             icon: "sparkles",
@@ -300,5 +408,104 @@ private struct CommunityLinkCard: View {
         .background(Color(UIColor.secondarySystemBackground))
         .clipShape(RoundedRectangle(cornerRadius: 20))
         .shadow(color: .black.opacity(0.05), radius: 10, y: 2)
+    }
+}
+
+private struct QuickBreathSheet: View {
+    let exercise: BreathExercise
+    @Environment(\.dismiss) var dismiss
+
+    @State private var scale: CGFloat = 0.5
+    @State private var stepLabel = "Get ready…"
+    @State private var currentRep = 0
+    @State private var isComplete = false
+    @State private var breathTask: Task<Void, Never>?
+
+    var body: some View {
+        ZStack {
+            Color.skyBg.ignoresSafeArea()
+
+            VStack(spacing: 32) {
+                Spacer()
+
+                VStack(spacing: 6) {
+                    Text(exercise.name)
+                        .font(.title2.weight(.bold))
+                        .foregroundColor(.skyText)
+                    Text(exercise.tagline)
+                        .font(.subheadline)
+                        .foregroundColor(.skySub)
+                }
+
+                ZStack {
+                    Circle()
+                        .fill(exercise.color.opacity(0.08))
+                        .frame(width: 220, height: 220)
+                    Circle()
+                        .fill(exercise.color.opacity(0.2))
+                        .frame(width: 220 * scale, height: 220 * scale)
+                    Circle()
+                        .fill(exercise.color)
+                        .frame(width: 76, height: 76)
+                    Text(stepLabel)
+                        .font(.footnote.weight(.semibold))
+                        .foregroundColor(.white)
+                        .multilineTextAlignment(.center)
+                }
+
+                if isComplete {
+                    VStack(spacing: 8) {
+                        Image(systemName: "checkmark.circle.fill")
+                            .font(.largeTitle)
+                            .foregroundColor(exercise.color)
+                        Text("Complete")
+                            .font(.title3.weight(.bold))
+                            .foregroundColor(.skyText)
+                        Text("Notice how you feel right now.")
+                            .font(.subheadline)
+                            .foregroundColor(.skySub)
+                    }
+                } else {
+                    Text("Round \(currentRep + 1) of \(exercise.totalReps)")
+                        .font(.subheadline)
+                        .foregroundColor(.skySub)
+                }
+
+                Spacer()
+
+                if isComplete {
+                    SKYPrimaryButton(title: "Done") { dismiss() }
+                        .padding(.horizontal, 32)
+                } else {
+                    Button("Stop") { dismiss() }
+                        .font(.footnote)
+                        .foregroundColor(.skyMuted)
+                }
+
+                Spacer().frame(height: 20)
+            }
+        }
+        .onAppear {
+            breathTask = Task { @MainActor in
+                try? await Task.sleep(for: .milliseconds(600))
+                for rep in 0..<exercise.totalReps {
+                    guard !Task.isCancelled else { return }
+                    currentRep = rep
+                    for step in exercise.pattern {
+                        guard !Task.isCancelled else { return }
+                        stepLabel = step.label
+                        withAnimation(.easeInOut(duration: step.duration)) {
+                            scale = step.targetScale
+                        }
+                        try? await Task.sleep(for: .seconds(step.duration))
+                    }
+                }
+                guard !Task.isCancelled else { return }
+                isComplete = true
+                stepLabel = ""
+                UINotificationFeedbackGenerator().notificationOccurred(.success)
+            }
+        }
+        .onDisappear { breathTask?.cancel() }
     }
 }

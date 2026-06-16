@@ -200,6 +200,13 @@ struct HomeView: View {
                         }
                         .animation(.easeInOut(duration: 0.3), value: practicedToday)
 
+                        // Today's session recap
+                        if let session = store.todaySession {
+                            TodaySessionCard(session: session)
+                                .transition(.opacity.combined(with: .scale(scale: 0.97)))
+                                .animation(.easeOut(duration: 0.35), value: practicedToday)
+                        }
+
                         // Streak at risk warning
                         if store.localStreakAtRisk {
                             HStack(spacing: 12) {
@@ -446,5 +453,66 @@ private struct RetreatBanner: View {
         .overlay {
             RoundedRectangle(cornerRadius: 16).stroke(Color(red: 253/255, green: 230/255, blue: 138/255), lineWidth: 1)
         }
+    }
+}
+
+private struct TodaySessionCard: View {
+    let session: LocalSession
+
+    private var moodEmoji: String? {
+        guard let score = session.moodScore else { return nil }
+        let emojis = ["", "😔", "😕", "😐", "🙂", "😊"]
+        return emojis.indices.contains(score) ? emojis[score] : nil
+    }
+
+    private var xpEarned: Int { session.type == "full" ? 100 : 50 }
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 14) {
+            HStack {
+                Label("Today's Practice", systemImage: "checkmark.circle.fill")
+                    .font(.footnote.weight(.semibold))
+                    .foregroundColor(Color(red: 22/255, green: 163/255, blue: 74/255))
+                Spacer()
+                Text("+\(xpEarned) XP")
+                    .font(.caption.weight(.bold))
+                    .foregroundColor(.skyIndigo)
+                    .padding(.horizontal, 10).padding(.vertical, 4)
+                    .background(Color.skyIndigoLight)
+                    .clipShape(Capsule())
+            }
+
+            HStack(spacing: 20) {
+                VStack(alignment: .leading, spacing: 3) {
+                    Text("\(session.durationSeconds / 60) min")
+                        .font(.title2.weight(.bold))
+                        .foregroundColor(.skyText)
+                    Text(session.type == "full" ? "Full session" : "Short session")
+                        .font(.caption)
+                        .foregroundColor(.skySub)
+                }
+                if let emoji = moodEmoji {
+                    Divider().frame(height: 36)
+                    VStack(alignment: .leading, spacing: 3) {
+                        Text(emoji).font(.title2)
+                        Text("Mood").font(.caption).foregroundColor(.skySub)
+                    }
+                }
+                Spacer()
+            }
+
+            if let note = session.note, !note.isEmpty {
+                Text(note)
+                    .font(.footnote)
+                    .foregroundColor(.skySub)
+                    .lineLimit(2)
+                    .lineSpacing(3)
+                    .padding(10)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .background(Color(UIColor.systemGray6))
+                    .clipShape(RoundedRectangle(cornerRadius: 10))
+            }
+        }
+        .skyCard()
     }
 }
