@@ -17,7 +17,7 @@ struct RegisterView: View {
                 VStack(spacing: 32) {
                     VStack(spacing: 8) {
                         Text("Create Account")
-                            .font(.system(size: 30, weight: .heavy))
+                            .font(.largeTitle.weight(.heavy))
                             .foregroundColor(.skyText)
                         Text("Enter your Art of Living course details.")
                             .font(.subheadline)
@@ -53,7 +53,7 @@ struct RegisterView: View {
                 .padding(.horizontal, 24)
             }
         }
-        .navigationBarHidden(true)
+        .toolbar(.hidden, for: .navigationBar)
     }
 
     private func handleRegister() async {

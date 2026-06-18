@@ -17,3 +17,9 @@ build/
 
 # OS
 .DS_Store
+
+# Xcode
+app-swift/**/xcuserdata/
+app-swift/**/*.xcuserstate
+app-swift/build/
+app-swift/DerivedData/

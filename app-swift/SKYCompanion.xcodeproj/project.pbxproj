@@ -1,0 +1,546 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 56;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		0B62192A24F049CC9431A6D1 /* Color+Sky.swift in Sources */ = {isa = PBXBuildFile; fileRef = A31ADF0170C54767A4894F55 /* Color+Sky.swift */; };
+		1A8EFE90BA304BDF840FF264 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D5715CF9AF9A40048589689F /* ContentView.swift */; };
+		1CA1C0220CFE42FF864E124D /* AuthNavigationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 413815927B904A63A1C5AC1A /* AuthNavigationView.swift */; };
+		214E39CCE9FC4C368AF2C6AF /* RegisterView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 49C7C6ADA0F64DB2A9E46BAF /* RegisterView.swift */; };
+		2DEDC6DED1EB4CB4850F791B /* OnboardingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0DE69C9176254891AD5C53F3 /* OnboardingView.swift */; };
+		331C503E064D407A8FE060F9 /* LoginView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8C03F15F8B9D474DA9E5FF27 /* LoginView.swift */; };
+		37F7A1D6C26B490F9F2803C9 /* SKYCompanionApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1240ECEB1E0B488EA54CD9D3 /* SKYCompanionApp.swift */; };
+		6B8FC66E80C5416E8B601F6B /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 41B0574C859E4E16A3A395E2 /* Assets.xcassets */; };
+		83E3F262DC1B4673B4022DD1 /* ProfileView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5424D4511B214D89AFC23609 /* ProfileView.swift */; };
+		8858E2B42FE074D90046C50D /* HealthKitService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8858E2B32FE074D90046C50D /* HealthKitService.swift */; };
+		8C9A5F225B1247A486D8F910 /* ProgressView_.swift in Sources */ = {isa = PBXBuildFile; fileRef = ADC6638FBFE44FD6BF3A4119 /* ProgressView_.swift */; };
+		926BCEF5D6614FC1BC3E88C5 /* AppStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27EAD8E8260F44EFA7686B83 /* AppStore.swift */; };
+		970EF4A19926402780F70A4C /* PracticeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 153D824ABD8B4E268A9E121F /* PracticeView.swift */; };
+		9D4E1168851544B585206FAE /* HomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B511D644573B48B9B1636E2A /* HomeView.swift */; };
+		9DF9C3EB466D43AB835A0EF2 /* ViewModifiers.swift in Sources */ = {isa = PBXBuildFile; fileRef = A120344D542E4C63B521B4CA /* ViewModifiers.swift */; };
+		A2AD8FEBA6FE44F983B3F54B /* StreakCalendarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 54E1B3E4AC284358A576F443 /* StreakCalendarView.swift */; };
+		A98DDFE015964A7DBD570287 /* BreathCircleView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 79158772DBBC4AE8B9A4D840 /* BreathCircleView.swift */; };
+		AE08C8032C7042578B6DEEF6 /* PostSessionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3C8E5288E85B424FA4593CDF /* PostSessionView.swift */; };
+		B926E4BA621042C3AC4859DE /* NotificationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37420BC208284BE8846B9058 /* NotificationService.swift */; };
+		D81D272A9C9F43C98B171450 /* User.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16AA84941FA74956B1D28DF6 /* User.swift */; };
+		DBC2BD3E6B6A469EBA79DA14 /* Session.swift in Sources */ = {isa = PBXBuildFile; fileRef = 13356E6A2BA24F1285D730B0 /* Session.swift */; };
+		DCC7343F9645447A9C0C2C0B /* CommunityView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4E8527CED7804010B41B0A4C /* CommunityView.swift */; };
+		E77100D7891B436283AF44E1 /* MainTabView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6CBC74ED88244FD6898E3673 /* MainTabView.swift */; };
+		EC8A378CDDA64973954A8D76 /* APIService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 34041964C24D42E09D2D7510 /* APIService.swift */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		0DE69C9176254891AD5C53F3 /* OnboardingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingView.swift; sourceTree = "<group>"; };
+		1240ECEB1E0B488EA54CD9D3 /* SKYCompanionApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SKYCompanionApp.swift; sourceTree = "<group>"; };
+		13356E6A2BA24F1285D730B0 /* Session.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Session.swift; sourceTree = "<group>"; };
+		153D824ABD8B4E268A9E121F /* PracticeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PracticeView.swift; sourceTree = "<group>"; };
+		16AA84941FA74956B1D28DF6 /* User.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = User.swift; sourceTree = "<group>"; };
+		27EAD8E8260F44EFA7686B83 /* AppStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppStore.swift; sourceTree = "<group>"; };
+		34041964C24D42E09D2D7510 /* APIService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = APIService.swift; sourceTree = "<group>"; };
+		37420BC208284BE8846B9058 /* NotificationService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationService.swift; sourceTree = "<group>"; };
+		3C8E5288E85B424FA4593CDF /* PostSessionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PostSessionView.swift; sourceTree = "<group>"; };
+		413815927B904A63A1C5AC1A /* AuthNavigationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthNavigationView.swift; sourceTree = "<group>"; };
+		41B0574C859E4E16A3A395E2 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		49C7C6ADA0F64DB2A9E46BAF /* RegisterView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RegisterView.swift; sourceTree = "<group>"; };
+		4E8527CED7804010B41B0A4C /* CommunityView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CommunityView.swift; sourceTree = "<group>"; };
+		5424D4511B214D89AFC23609 /* ProfileView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileView.swift; sourceTree = "<group>"; };
+		54E1B3E4AC284358A576F443 /* StreakCalendarView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StreakCalendarView.swift; sourceTree = "<group>"; };
+		6CBC74ED88244FD6898E3673 /* MainTabView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainTabView.swift; sourceTree = "<group>"; };
+		79158772DBBC4AE8B9A4D840 /* BreathCircleView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BreathCircleView.swift; sourceTree = "<group>"; };
+		8858E2B32FE074D90046C50D /* HealthKitService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HealthKitService.swift; sourceTree = "<group>"; };
+		8858E2B52FE076F20046C50D /* SKYCompanion.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = SKYCompanion.entitlements; sourceTree = "<group>"; };
+		8858E2B62FE077290046C50D /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
+		8C03F15F8B9D474DA9E5FF27 /* LoginView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginView.swift; sourceTree = "<group>"; };
+		A120344D542E4C63B521B4CA /* ViewModifiers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewModifiers.swift; sourceTree = "<group>"; };
+		A31ADF0170C54767A4894F55 /* Color+Sky.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Color+Sky.swift"; sourceTree = "<group>"; };
+		ADC6638FBFE44FD6BF3A4119 /* ProgressView_.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProgressView_.swift; sourceTree = "<group>"; };
+		B511D644573B48B9B1636E2A /* HomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeView.swift; sourceTree = "<group>"; };
+		D1077ADB446048B685918085 /* SKYCompanion.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = SKYCompanion.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		D5715CF9AF9A40048589689F /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		50B3C7DB15B0405E990B8C01 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		0FDD8E1FB04447309C67A684 /* Onboarding */ = {
+			isa = PBXGroup;
+			children = (
+				0DE69C9176254891AD5C53F3 /* OnboardingView.swift */,
+			);
+			path = Onboarding;
+			sourceTree = "<group>";
+		};
+		1CDDF04D8049451A8D026D5F /* Practice */ = {
+			isa = PBXGroup;
+			children = (
+				79158772DBBC4AE8B9A4D840 /* BreathCircleView.swift */,
+				153D824ABD8B4E268A9E121F /* PracticeView.swift */,
+			);
+			path = Practice;
+			sourceTree = "<group>";
+		};
+		24FD6DB5E48E44278A8317AC /* SKYCompanion */ = {
+			isa = PBXGroup;
+			children = (
+				8858E2B62FE077290046C50D /* Info.plist */,
+				8858E2B52FE076F20046C50D /* SKYCompanion.entitlements */,
+				E7B9B179ED6F47D4ADD0F9A7 /* Extensions */,
+				F57A36FBE04E49D78178F536 /* Models */,
+				B8DF724191424514B137A0EB /* Services */,
+				43E8834D7FFD4B2E8DFC0CC0 /* Store */,
+				DF8FE8B9CB6D462FA5455AD0 /* Views */,
+				1240ECEB1E0B488EA54CD9D3 /* SKYCompanionApp.swift */,
+				D5715CF9AF9A40048589689F /* ContentView.swift */,
+				41B0574C859E4E16A3A395E2 /* Assets.xcassets */,
+			);
+			path = SKYCompanion;
+			sourceTree = "<group>";
+		};
+		43E8834D7FFD4B2E8DFC0CC0 /* Store */ = {
+			isa = PBXGroup;
+			children = (
+				27EAD8E8260F44EFA7686B83 /* AppStore.swift */,
+			);
+			path = Store;
+			sourceTree = "<group>";
+		};
+		48719D2FB10644928237BB6F /* Progress */ = {
+			isa = PBXGroup;
+			children = (
+				ADC6638FBFE44FD6BF3A4119 /* ProgressView_.swift */,
+				54E1B3E4AC284358A576F443 /* StreakCalendarView.swift */,
+			);
+			path = Progress;
+			sourceTree = "<group>";
+		};
+		6130FEB333244716ADC5EA61 = {
+			isa = PBXGroup;
+			children = (
+				24FD6DB5E48E44278A8317AC /* SKYCompanion */,
+				BBCF2B3C961C4A2DA6C32BF5 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		8581508A66C84104B826C75F /* Main */ = {
+			isa = PBXGroup;
+			children = (
+				6CBC74ED88244FD6898E3673 /* MainTabView.swift */,
+			);
+			path = Main;
+			sourceTree = "<group>";
+		};
+		B0F99201DBF34E8D9D95FEFF /* Auth */ = {
+			isa = PBXGroup;
+			children = (
+				413815927B904A63A1C5AC1A /* AuthNavigationView.swift */,
+				8C03F15F8B9D474DA9E5FF27 /* LoginView.swift */,
+				49C7C6ADA0F64DB2A9E46BAF /* RegisterView.swift */,
+			);
+			path = Auth;
+			sourceTree = "<group>";
+		};
+		B8DF724191424514B137A0EB /* Services */ = {
+			isa = PBXGroup;
+			children = (
+				34041964C24D42E09D2D7510 /* APIService.swift */,
+				37420BC208284BE8846B9058 /* NotificationService.swift */,
+				8858E2B32FE074D90046C50D /* HealthKitService.swift */,
+			);
+			path = Services;
+			sourceTree = "<group>";
+		};
+		BBCF2B3C961C4A2DA6C32BF5 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				D1077ADB446048B685918085 /* SKYCompanion.app */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		C2C2300A5ABF45F1987CD157 /* Community */ = {
+			isa = PBXGroup;
+			children = (
+				4E8527CED7804010B41B0A4C /* CommunityView.swift */,
+			);
+			path = Community;
+			sourceTree = "<group>";
+		};
+		C6409710E78C48F695C58866 /* Home */ = {
+			isa = PBXGroup;
+			children = (
+				B511D644573B48B9B1636E2A /* HomeView.swift */,
+			);
+			path = Home;
+			sourceTree = "<group>";
+		};
+		DC34DDED70EE4374B5774613 /* PostSession */ = {
+			isa = PBXGroup;
+			children = (
+				3C8E5288E85B424FA4593CDF /* PostSessionView.swift */,
+			);
+			path = PostSession;
+			sourceTree = "<group>";
+		};
+		DF8FE8B9CB6D462FA5455AD0 /* Views */ = {
+			isa = PBXGroup;
+			children = (
+				B0F99201DBF34E8D9D95FEFF /* Auth */,
+				C2C2300A5ABF45F1987CD157 /* Community */,
+				C6409710E78C48F695C58866 /* Home */,
+				8581508A66C84104B826C75F /* Main */,
+				0FDD8E1FB04447309C67A684 /* Onboarding */,
+				DC34DDED70EE4374B5774613 /* PostSession */,
+				1CDDF04D8049451A8D026D5F /* Practice */,
+				EF9CDFC314EE4256AF4CDE11 /* Profile */,
+				48719D2FB10644928237BB6F /* Progress */,
+			);
+			path = Views;
+			sourceTree = "<group>";
+		};
+		E7B9B179ED6F47D4ADD0F9A7 /* Extensions */ = {
+			isa = PBXGroup;
+			children = (
+				A31ADF0170C54767A4894F55 /* Color+Sky.swift */,
+				A120344D542E4C63B521B4CA /* ViewModifiers.swift */,
+			);
+			path = Extensions;
+			sourceTree = "<group>";
+		};
+		EF9CDFC314EE4256AF4CDE11 /* Profile */ = {
+			isa = PBXGroup;
+			children = (
+				5424D4511B214D89AFC23609 /* ProfileView.swift */,
+			);
+			path = Profile;
+			sourceTree = "<group>";
+		};
+		F57A36FBE04E49D78178F536 /* Models */ = {
+			isa = PBXGroup;
+			children = (
+				13356E6A2BA24F1285D730B0 /* Session.swift */,
+				16AA84941FA74956B1D28DF6 /* User.swift */,
+			);
+			path = Models;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		E1E76E155C9A47148770F243 /* SKYCompanion */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 055E7A6D16E14BFCB47074D2 /* Build configuration list for PBXNativeTarget "SKYCompanion" */;
+			buildPhases = (
+				05AB30EAB024452F84CFDF83 /* Sources */,
+				50B3C7DB15B0405E990B8C01 /* Frameworks */,
+				1BC3F041EE2A4DBD9D55BD0E /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = SKYCompanion;
+			productName = SKYCompanion;
+			productReference = D1077ADB446048B685918085 /* SKYCompanion.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		B14FB1438D5C4B4E93CEBC97 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = 1;
+				LastSwiftUpdateCheck = 1540;
+				LastUpgradeCheck = 2650;
+				TargetAttributes = {
+					E1E76E155C9A47148770F243 = {
+						CreatedOnToolsVersion = 15.4;
+					};
+				};
+			};
+			buildConfigurationList = 7C339E7ADF1D4DE3A3C3B68C /* Build configuration list for PBXProject "SKYCompanion" */;
+			compatibilityVersion = "Xcode 14.0";
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = 6130FEB333244716ADC5EA61;
+			productRefGroup = BBCF2B3C961C4A2DA6C32BF5 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				E1E76E155C9A47148770F243 /* SKYCompanion */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		1BC3F041EE2A4DBD9D55BD0E /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				6B8FC66E80C5416E8B601F6B /* Assets.xcassets in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		05AB30EAB024452F84CFDF83 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				37F7A1D6C26B490F9F2803C9 /* SKYCompanionApp.swift in Sources */,
+				1A8EFE90BA304BDF840FF264 /* ContentView.swift in Sources */,
+				0B62192A24F049CC9431A6D1 /* Color+Sky.swift in Sources */,
+				9DF9C3EB466D43AB835A0EF2 /* ViewModifiers.swift in Sources */,
+				DBC2BD3E6B6A469EBA79DA14 /* Session.swift in Sources */,
+				D81D272A9C9F43C98B171450 /* User.swift in Sources */,
+				EC8A378CDDA64973954A8D76 /* APIService.swift in Sources */,
+				B926E4BA621042C3AC4859DE /* NotificationService.swift in Sources */,
+				926BCEF5D6614FC1BC3E88C5 /* AppStore.swift in Sources */,
+				1CA1C0220CFE42FF864E124D /* AuthNavigationView.swift in Sources */,
+				331C503E064D407A8FE060F9 /* LoginView.swift in Sources */,
+				214E39CCE9FC4C368AF2C6AF /* RegisterView.swift in Sources */,
+				DCC7343F9645447A9C0C2C0B /* CommunityView.swift in Sources */,
+				9D4E1168851544B585206FAE /* HomeView.swift in Sources */,
+				E77100D7891B436283AF44E1 /* MainTabView.swift in Sources */,
+				2DEDC6DED1EB4CB4850F791B /* OnboardingView.swift in Sources */,
+				AE08C8032C7042578B6DEEF6 /* PostSessionView.swift in Sources */,
+				A98DDFE015964A7DBD570287 /* BreathCircleView.swift in Sources */,
+				970EF4A19926402780F70A4C /* PracticeView.swift in Sources */,
+				83E3F262DC1B4673B4022DD1 /* ProfileView.swift in Sources */,
+				8C9A5F225B1247A486D8F910 /* ProgressView_.swift in Sources */,
+				A2AD8FEBA6FE44F983B3F54B /* StreakCalendarView.swift in Sources */,
+				8858E2B42FE074D90046C50D /* HealthKitService.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		3727F357458B4614AF09259D /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = SKYCompanion/SKYCompanion.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_ASSET_PATHS = "";
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = SKYCompanion/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = "SKY Companion";
+				INFOPLIST_KEY_NSUserNotificationsUsageDescription = "SKY Companion sends a daily reminder so you don't miss your practice.";
+				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UIStatusBarStyle = UIStatusBarStyleDefault;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.adityahtotlani.skycompanion;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		7898BDD7EA35496E9A1229C4 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				DEVELOPMENT_TEAM = 9NVM22SR38;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = iphoneos;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+			};
+			name = Debug;
+		};
+		C9725830CB5141ACAAAA0376 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = SKYCompanion/SKYCompanion.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_ASSET_PATHS = "";
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = SKYCompanion/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = "SKY Companion";
+				INFOPLIST_KEY_NSUserNotificationsUsageDescription = "SKY Companion sends a daily reminder so you don't miss your practice.";
+				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UIStatusBarStyle = UIStatusBarStyleDefault;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.adityahtotlani.skycompanion;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+		D24C6F8877244845BD4B550A /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				DEVELOPMENT_TEAM = 9NVM22SR38;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = NO;
+				SDKROOT = iphoneos;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_COMPILATION_MODE = wholemodule;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		055E7A6D16E14BFCB47074D2 /* Build configuration list for PBXNativeTarget "SKYCompanion" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				3727F357458B4614AF09259D /* Debug */,
+				C9725830CB5141ACAAAA0376 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		7C339E7ADF1D4DE3A3C3B68C /* Build configuration list for PBXProject "SKYCompanion" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				7898BDD7EA35496E9A1229C4 /* Debug */,
+				D24C6F8877244845BD4B550A /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = B14FB1438D5C4B4E93CEBC97 /* Project object */;
+}

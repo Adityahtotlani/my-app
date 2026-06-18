@@ -6,9 +6,9 @@ fastify.register(require('@fastify/postgres'), {
   connectionString: process.env.DATABASE_URL
 });
 
-fastify.register(require('@fastify/redis'), {
-  url: process.env.REDIS_URL
-});
+if (process.env.REDIS_URL) {
+  fastify.register(require('@fastify/redis'), { url: process.env.REDIS_URL });
+}
 
 fastify.register(require('@fastify/jwt'), {
   secret: process.env.JWT_SECRET

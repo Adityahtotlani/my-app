@@ -17,7 +17,7 @@ enum APIError: LocalizedError {
 }
 
 struct APIService {
-    static let baseURL = "https://octoally.adityatotlani.ch"
+    static let baseURL = "http://localhost:3000"
 
     static func request<T: Decodable>(
         path: String,
